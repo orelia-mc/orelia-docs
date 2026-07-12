@@ -1,0 +1,90 @@
+site_name: Orelia Documentation
+site_description: Orelia Minecraft RPG プラグイン群の仕様書
+site_url: https://orelia-mc.github.io/orelia-docs/
+repo_name: orelia-mc/orelia-docs
+repo_url: https://github.com/orelia-mc/orelia-docs
+
+theme:
+  name: material
+  language: ja
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: ダークモードに切り替え
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: ライトモードに切り替え
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.indexes
+    - navigation.footer
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.tabs.link
+  icon:
+    repo: fontawesome/brands/github
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - tables
+  - toc:
+      permalink: true
+  - attr_list
+  - md_in_html
+
+nav:
+  - ホーム: index.md
+  - アーキテクチャ:
+      - 3プラグイン構成: architecture/overview.md
+      - モジュールライフサイクル: architecture/module-lifecycle.md
+      - Config システム: architecture/config.md
+      - データベース層: architecture/database.md
+      - プレイヤーデータ: architecture/player-data.md
+      - コマンド体系: architecture/commands.md
+  - orelia-core:
+      - 概要: core/index.md
+      - 公開API (rpg.api): core/api.md
+      - Item: core/item.md
+      - Skill: core/skill.md
+      - Job: core/job.md
+      - Status: core/status.md
+      - Accessory: core/accessory.md
+      - Monster: core/monster.md
+      - Boss: core/boss.md
+      - Effect: core/effect.md
+      - Economy: core/economy.md
+      - GUI: core/gui.md
+  - orelia-world:
+      - 概要: world/index.md
+      - Quest: world/quest.md
+      - NPC: world/npc.md
+      - Dialogue: world/dialogue.md
+      - Story: world/story.md
+      - Dungeon: world/dungeon.md
+      - Region: world/region.md
+      - CutScene: world/cutscene.md
+      - Event: world/event.md
