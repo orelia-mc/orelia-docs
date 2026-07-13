@@ -88,3 +88,15 @@ nav:
       - Region: world/region.md
       - CutScene: world/cutscene.md
       - Event: world/event.md
+  - orelia-extra:
+      - 概要: extra/index.md
+      - Party: extra/party.md
+      - Guild: extra/guild.md
+      - Trade: extra/trade.md
+      - Mail: extra/mail.md
+      - Auction: extra/auction.md
+      - Housing: extra/housing.md
+      - Pet: extra/pet.md
+      - Mount: extra/mount.md
+      - Ranking: extra/ranking.md
+      - Achievement: extra/achievement.md
