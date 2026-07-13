@@ -4,7 +4,7 @@
 
 - `orelia-core`（別リポジトリ） — 戦闘/プレイヤー/ステータス基盤。必須依存
 - **orelia-world**（本体） — Quest, NPC, Dialogue, Story, Dungeon, Region, CutScene, Event
-- `orelia-extra`（未実装） — 後続MMORPG機能
+- [`orelia-extra`](../extra/index.md)（別リポジトリ） — 後発MMORPG機能。`QuestApi` 経由でこのプラグインにソフト依存
 
 ## 統合ルール
 

@@ -10,7 +10,12 @@ graph TB
   subgraph orelia-world["orelia-world（コンテンツ層）"]
     Region --> Dialogue --> Story --> Event --> CutScene --> Dungeon --> Quest --> Npc
   end
+  subgraph orelia-extra["orelia-extra（後発MMORPG機能）"]
+    Party --> Guild --> Trade --> Mail --> Auction --> Housing --> Pet --> Mount --> Ranking --> Achievement
+  end
   orelia-world -->|rpg.api.* 経由のみ| Api
+  orelia-extra -->|rpg.api.* 経由のみ| Api
+  orelia-extra -.->|rpg.world.api.QuestApi（ソフト依存）| Quest
 ```
 
 ## orelia-core
@@ -25,18 +30,20 @@ Core, Item, Skill, Job, Status, Accessory, Monster, Boss, Effect, Economy, GUI, 
 
 Quest, NPC, Dialogue, Story, Dungeon, Region, CutScene, Event
 
-## orelia-extra（未実装）
+## orelia-extra
 
-Party, Guild, Trade などの後続 MMORPG 機能を予定。
+後発 MMORPG 機能プラグイン。`depend: [OreliaCore]`、`softdepend: [OreliaWorld, Vault]`。
+
+Party, Guild, Trade, Mail, Auction, Housing, Pet, Mount, Ranking, Achievement
 
 ## 統合ルール
 
 - `orelia-world` / `orelia-extra` は `orelia-core` の内部モジュールクラス（`rpg.status.*`, `rpg.item.*` など）に直接アクセスしてはならない。
-- 唯一の統合面は `rpg.api.*`（Bukkit `ServicesManager` 経由で公開）と、汎用インフラである `rpg.core.*` / `rpg.database.*`（`ConfigManager`, `SchedulerService`, `PlayerDataManager`, `PlayerDataComponent`, `DatabaseManager`, `SchemaOwner`）。
-- お金のやり取り（クエスト報酬、NPCショップなど）は Vault の `Economy` を直に使う。専用の EconomyApi は存在しない。
+- 唯一の統合面は `rpg.api.*`（Bukkit `ServicesManager` 経由で公開）と、汎用インフラである `rpg.core.*` / `rpg.database.*`（`ConfigManager`, `SchedulerService`, `PlayerDataManager`, `PlayerDataComponent`, `DatabaseManager`, `SchemaOwner`）。`orelia-extra` が `orelia-world` の `QuestApi`（`rpg.world.api`）を参照する場合も同様に、`orelia-world` の内部クラスには触れない。
+- お金のやり取り（クエスト報酬、NPCショップ、オークション決済など）は Vault の `Economy` を直に使う。専用の EconomyApi は存在しない。
 - 各プラグインはそれぞれ独自の `ConfigManager` / `SchedulerService` インスタンスを持つ（共有インフラの実装を再利用しているだけで、プロセスは共有しない）。
 
-両プラグインとも、モジュールシステム・Config・コマンド体系は同じ設計パターンを踏襲しています。詳細は以下を参照してください。
+いずれのプラグインも、モジュールシステム・Config・コマンド体系は同じ設計パターンを踏襲しています。詳細は以下を参照してください。
 
 - [モジュールライフサイクル](module-lifecycle.md)
 - [Config システム](config.md)
