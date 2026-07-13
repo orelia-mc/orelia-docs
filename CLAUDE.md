@@ -32,3 +32,7 @@ This documentation was written by reading `orelia-core`/`orelia-world` source di
 - Preserve the existing per-module structure (domain model → real YAML example → services/formulas → commands → cross-module API usage) so pages stay consistent with each other.
 - If you find a documented behavior that no longer matches the source, fix the doc — the sibling repos are the source of truth, this repo is derived from them.
 - A few known integration gaps are intentionally documented as such (e.g. `orelia-world`'s dungeon-clear not yet triggering quest `CLEAR_DUNGEON` objectives, `EventScheduleService` multipliers not yet applied to reward grants) — don't silently "fix" these in the docs by describing wiring that doesn't exist in the code.
+
+## Committing changes
+
+When committing, also update README.md and README_EN.md accordingly.
