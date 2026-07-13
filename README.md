@@ -1,4 +1,4 @@
-<img src="./assets/logo_wide.jpg" />
+<img src="https://orelia-mc.github.io/assets/logo_wide.jpg" />
 <h1 align="center">Orelia Docs</h1>
 <p align="center">Documentation of Orelia-MC</p>
 
