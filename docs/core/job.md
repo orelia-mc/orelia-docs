@@ -1,11 +1,11 @@
 # Job モジュール（`rpg.job`）
 
-静的でconfig駆動の職業/クラスシステム（剣士/槍士/戦士/弓士）。武器種を制限し、パッシブなステータス補正を与えます。経験値やレベリングは持たず、変更するまで維持されるフラットな状態です。
+静的でconfig駆動の職業/クラスシステム（剣士/槍士/戦士/弓士/釣り人）。武器種を制限し、パッシブなステータス補正を与えます。経験値やレベリングは持たず、変更するまで維持されるフラットな状態です。
 
 ## ドメインモデル
 
 ```java
-enum JobType { SWORDSMAN, SPEARMAN, WARRIOR, ARCHER } // 固定。追加には実装変更が必要
+enum JobType { SWORDSMAN, SPEARMAN, WARRIOR, ARCHER, FISHERMAN } // 固定。追加には実装変更が必要
 
 class Job {
     JobType type;
@@ -33,6 +33,9 @@ jobs:
       ATK: 2
       AGI: 1
 ```
+
+!!! note "FISHERMAN はまだステータス補正なし"
+    `FISHERMAN`（釣り人）はジョブとしてのみ追加済みです。レベリングやパッシブ補正の設計は未定のため、`jobs.yml` の該当セクションは `allowed-weapons: []` のみで `passive-bonus` を持ちません。
 
 ## サービス/マネージャー
 
