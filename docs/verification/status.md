@@ -1,6 +1,9 @@
 # Status（レベル/ステータス）の動作確認
 
-対象: `rpg.status`（[Status モジュール仕様](../core/status.md)）。他モジュールに依存しない基盤モジュールで、レベル/経験値、派生ステータス（HP, SP, ATK, DEF, AGI, DEX, INT, CRT, CRT_DMG, SPD）、HP/SP自然回復を管理します。
+対象: `rpg.status`（[Status モジュール仕様](../core/status.md)）。他モジュールに依存しない基盤モジュールで、レベル/経験値、派生ステータス（HP, SP, ATK, DEF, CRT, CRT_DMG, SPD の7種。**AGI/DEX/INTは廃止済み**）、HP/SP自然回復を管理します。
+
+!!! info "AGI/DEX/INTは削除されています"
+    以前の `StatType` には AGI/DEX/INT も含まれていましたが、現在は削除され7種のみです。`/ol status` の画面や `config.yml: status.growth` にこれらが表示・設定されていても、それは古いconfigの残骸なので `/oladmin reload` 後も反映されません。表示されるのが7種で揃っていることをまず確認してください。
 
 ## 前提条件
 

@@ -22,6 +22,7 @@ mkdocs build --strict             # build to site/ (fails on any warning)
 - `docs/core/` — each gameplay module of `orelia-core` (Item / Skill / Job / Status / Accessory / Monster / Boss / Effect / Economy / GUI) and the public API (`rpg.api.*`)
 - `docs/world/` — each content module of `orelia-world` (Quest / NPC / Dialogue / Story / Dungeon / Region / CutScene / Event)
 - `docs/extra/` — each feature module of `orelia-extra` (Party / Guild / Trade / Mail / Auction / Housing / Pet / Mount / Ranking / Achievement)
+- `docs/verification/` — post-install checklist and per-feature in-game verification steps (Job / Skill / Item / Status / Accessory / Gathering / Monster / Boss / Economy / GUI / Effect)
 
 Navigation is explicitly defined in `mkdocs.yml`'s `nav:`. Any new page must be added there too.
 

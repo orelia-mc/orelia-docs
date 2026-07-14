@@ -13,6 +13,7 @@
     - [Item（武器）](item.md)
     - [Status（レベル/ステータス）](status.md)
     - [Accessory（装飾品）](accessory.md)
+    - [Gathering（採取/農業）](gathering.md)
     - [Monster（モンスター）](monster.md)
     - [Boss（ボス）](boss.md)
     - [Economy（経済）](economy.md)
@@ -23,8 +24,9 @@
 
 - Paper 1.21.x サーバー、Java 21。
 - 確認はOP権限を持つテストアカウントで行うことを想定しています（`/oladmin` は `orelia.admin`、デフォルトop）。
-- 特記が無い限り、`orelia-core` 単体（`orelia-world` 未導入）でも確認できる項目のみを扱います。職業変更など `orelia-world` のNPCが必要な項目はその旨を明記しています。
-- config は初期値（`items.yml`/`jobs.yml`/`skills.yml`/`monsters.yml`/`bosses.yml`/`accessories.yml`/`effects.yml` 同梱のデフォルト）のままである前提で、実際のID・数値を手順に記載しています。config を変更済みの場合はその内容に読み替えてください。
+- 特記が無い限り、`orelia-core` 単体（`orelia-world` 未導入）でも確認できる項目のみを扱います。職業変更・武器スキル画面（`SkillGuiScreen`）など `orelia-world` のNPCや「プレイヤー情報」ネザースターが必要な項目はその旨を明記しています。
+- config は初期値（`items.yml`/`jobs.yml`/`skills.yml`/`monsters.yml`/`bosses.yml`/`accessories.yml`/`effects.yml`/`gathering.yml` 同梱のデフォルト）のままである前提で、実際のID・数値を手順に記載しています。config を変更済みの場合はその内容に読み替えてください。
+- 職業ロースターは `FENCER`/`WARRIOR`/`ARCHER` の3種（`SPEARMAN` は廃止済み）、ステータスは `HP, SP, ATK, DEF, CRT, CRT_DMG, SPD` の7種（`AGI`/`DEX`/`INT` は廃止済み）を前提に記載しています。
 
 ## 表記ルール
 

@@ -2,24 +2,23 @@
 
 対象: `rpg.skill`（[Skill モジュール仕様](../core/skill.md)）。`skills.yml` の定義を「executor」アーキタイプが実行し、武器にスキルをソケットし、スキルポイントで習得・レベルアップします。
 
-!!! danger "既知の未接続ギャップ: SkillGuiScreen への導線が無い"
-    技のソケット（`SkillSocketService.socket`）・習得/レベルアップ（`SkillProgressService.upgradeSkill`）は `SkillGuiScreen` のクリックハンドラからのみ呼ばれますが、このドキュメント作成時点のコードベースには **`SkillGuiScreen` を開くプレイヤー向けの導線が一切ありません**。
-    
-    - `orelia-core` 側: `/ol` に登録されている player コマンドは `item` / `job` / `status` の3つのみで、スキル画面を開くコマンドはありません。
-    - `orelia-world` 側: `NpcType` は `WEAPON_SHOP, ARMOR_SHOP, ACCESSORY_SHOP, QUEST_RECEPTIONIST, JOB_CHANGE, ENHANCEMENT, WAREHOUSE, GUILD_RECEPTIONIST` の8種のみで、スキル画面を開くNPC種別が存在しません。
-    - `GuiApi.openSkill(Player)` というAPIメソッド自体は `rpg.api` に存在しますが、`orelia-core`/`orelia-world` のどちらのコードからも呼び出されていません。
-    
-    これは実装バグではなく「未接続」の状態です。ドキュメントを直すために存在しない導線を書き足すことはせず、この節では**検証時の回避策**を示します。恒久対応（NPCタイプ追加やコマンド追加）が入った場合は、この節を実際の導線に置き換えてください。
+## `SkillGuiScreen` への到達経路
 
-## 検証のための回避策
+技のソケット（`SkillSocketService.socket`）・習得/レベルアップ（`SkillProgressService.upgradeSkill`）は `SkillGuiScreen` のクリックハンドラからのみ呼ばれます。到達経路は導入しているプラグイン構成によって異なります。
 
-以下のいずれかの方法で `SkillGuiScreen` に到達してください。
+- **`orelia-world` 導入時（推奨）**: サーバー参加時、右端のホットバースロットに「プレイヤー情報」ネザースター（`orelia-world` の `PlayerInfoModule`）が自動的に固定配置されます（投げる・ドラッグで動かす・クリエイティブでの削除、いずれも不可）。これを右クリック →「プレイヤー情報」メニュー（27スロット）→ 「スキル」ボタン（スロット14, ENCHANTED_BOOK）で `PlayerInfoSkillGuiScreen`（36スロット）が開きます。ここに表示される習得済みスキル、または「習得済みスキルはありません」ボタンをクリックすると、`GuiApi.openSkill(player)` 経由で **orelia-core本体の `SkillGuiScreen` が開きます**（現在手に持っている武器にスコープされます）。
+- **`orelia-core` 単体（`orelia-world` 未導入）**: `SkillGuiScreen` を開くプレイヤー向けの導線は `orelia-core` 単体には存在しません（`/ol` に登録されている player コマンドは `item`/`job`/`status`/`gathering` のみ）。この場合は下記の回避策を使ってください。
 
-1. **一時的な検証用コマンド/NPCを足す**: `GuiApi.openSkill(player)` を呼ぶだけの1行コマンド、または `npc.yml` に暫定で新しい `NpcType`（要コード変更）やテスト用リスナーを追加し、動作確認後に取り除く。
-2. **サービスを直接叩く小さな検証プラグイン**: `SkillSocketService.socket(ItemStack, String skillId, int maxSlots)` は純粋なアイテム操作（PDC文字列 `"socketed_skills"` への書き込み）なので、プレイヤー無しでも呼び出せます。手持ちの武器の `skill-slot-count`（`items.yml`）を `maxSlots` として渡し、対象スキルIDをソケットします。
-3. **`SkillProgressService.grantSkillPoints`/`upgradeSkill`** を検証プラグインから直接呼び出し、スキルポイント付与→習得（`upgradeSkill` はSP1消費、+1レベル、`maxLevel`で頭打ち）を行う。
+!!! danger "orelia-core単体では依然として未接続"
+    `GuiApi.openSkill(Player)` というAPIメソッド自体は `rpg.api` にありますが、`orelia-core` 単体のコードからはどこからも呼ばれていません。`orelia-world` の「プレイヤー情報」ネザースターがこのAPIを呼ぶ唯一の場所です。`orelia-world` を導入しない構成でスキル画面を検証する場合は、以下のいずれかの回避策を使ってください。
 
-いずれの方法でも、以下のGUI由来の仕様は個別に確認しておいてください（`SkillGuiScreen` のロジック）：
+    1. **一時的な検証用コマンドを足す**: `GuiApi.openSkill(player)` を呼ぶだけの1行コマンドを暫定で追加し、動作確認後に取り除く。
+    2. **サービスを直接叩く小さな検証プラグイン**: `SkillSocketService.socket(ItemStack, String skillId, int maxSlots)` は純粋なアイテム操作（PDC文字列 `"socketed_skills"` への書き込み）なので、プレイヤー無しでも呼び出せます。手持ちの武器の `skill-slot-count`（`items.yml`）を `maxSlots` として渡し、対象スキルIDをソケットします。
+    3. **`SkillProgressService.grantSkillPoints`/`upgradeSkill`** を検証プラグインから直接呼び出し、スキルポイント付与→習得（`upgradeSkill` はSP1消費、+1レベル、`maxLevel`で頭打ち）を行う。
+
+    `EquipmentGuiScreen`（装備画面）は `GuiApi.openEquipment` 経由ですが、こちらは `orelia-world` からも呼び出されておらず、現時点で**到達経路が無いまま**です（[GUI の確認手順](gui.md)参照）。
+
+いずれの経路でも、以下のGUI由来の仕様は個別に確認しておいてください（`SkillGuiScreen` のロジック）：
 
 - 識別可能なOrelia武器を手に持っていない状態でGUIを開くとBARRIER表示になる。
 - 手に持っている武器の `weapon-type` に対応するスキルだけが一覧表示される（例: SWORD装備中なら `slash`/`spin_slash`/`iaijutsu`/`cross_slash` の4つ）。
@@ -28,10 +27,11 @@
 
 ## 1. ソケット・習得ができていることの確認
 
-回避策でソケット・習得を行った後、武器を実際にインベントリへ持たせて:
+上記いずれかの経路でソケット・習得を行った後、武器を実際にインベントリへ持たせて:
 
 1. 武器のPDCに `socketed_skills`（`;` 区切り）でスキルIDが入っていることを確認する（`SkillSocketService.getSocketedSkills`/`hasSkill` 相当の状態）。
 2. `PlayerSkillComponent.skillLevels` にそのスキルのレベルが1以上入っていること（`SkillCastService.cast` が `NOT_LEARNED` を返さないことで間接確認できる）。
+3. `orelia-world` 経由の場合、「プレイヤー情報」→「スキル」画面に習得済みスキルが `SkillApi.getLearnedSkills` の結果として一覧表示されること（レベル/最大レベル表示付き）も確認する。
 
 ## 2. スキル発動（右クリック等）の確認
 
@@ -41,14 +41,14 @@
 - シフト+右クリック = スロット1のスキル
 - オフハンド切替キー = スロット2のスキル（弓でも同様に動作）
 
-各武器種で1つずつ、スロット0に技をソケット・習得した状態で発動を確認します。
+各武器種で1つずつ、スロット0に技をソケット・習得した状態で発動を確認します。職業ごとに使える武器種が異なる点は [Job の確認手順](job.md) を参照してください（現在の職業ロースターは FENCER=SWORD, WARRIOR=AXE, ARCHER=BOW の3種で、SPEAR系スキルはどの職業でも武器を装備できないため通常運用では検証できません — 検証したい場合は `/ol item give` でSPEAR武器を直接持たせてスキル発動だけを試すことは可能です）。
 
 | 武器種 | 例 | executor-type | 確認ポイント |
 |---|---|---|---|
 | SWORD | 斬撃 `slash` | MELEE_CONE | 前方コーン範囲内の敵にのみダメージ、`SWEEP_ATTACK`パーティクル |
 | SWORD | 回転斬り `spin_slash` | MELEE_AOE | 自分中心・半径3.5の全方位にダメージ |
 | SWORD | 居合 `iaijutsu` | DASH_STRIKE | 前方に踏み込み、最初に当たった敵にダメージ（ダメージ倍率2.2倍が突出して大きい） |
-| SPEAR | 突進 `charge_thrust` | DASH_STRIKE | 前方へダッシュ、ノックバック0.7と大きめ |
+| SPEAR | 突進 `charge_thrust` | DASH_STRIKE | 前方へダッシュ、ノックバック0.7と大きめ（※現状どの職業も装備できない） |
 | AXE | バーサーク `berserk` | MELEE_AOE | 半径4.0、クールダウン15秒と長め |
 | BOW | パワーショット `power_shot` | ARROW_VOLLEY | 単発・高精度の矢（`radius: 0`） |
 | BOW | マルチショット `multi_shot` | ARROW_VOLLEY | 3本が`radius: 20`度に拡散して発射される |
@@ -94,3 +94,4 @@
 - 弓のスキルをソケット・習得した状態で、剣を持ち替えて発動しようとすると `WRONG_WEAPON` になること。
 - スキルスロット数（`skill-slot-count`）を超えてソケットしようとした場合の挙動（拒否される、または上書きされる）を確認し、`items.yml` の値（1〜2個）どおりに制限されているか確認する。
 - 同じ武器を複数本（スタック）所持している場合、ソケット状態はスタック内の代表アイテムだけに反映され、他の個体には反映されないこと（PDCはアイテム個体ごとの状態のため）。
+- モンスターの `element`（`monsters.yml`）と自分の武器の `element` が一致している場合、`weakness` 設定によっては通常攻撃・スキル攻撃ともに1.5倍ダメージが乗ることがあります（[Monster の確認手順](monster.md) の弱点属性の節）。スキルのダメージ倍率と弱点属性の倍率は独立して乗算されるため、想定より大きいダメージが出ても弱点ヒットが原因でないか確認してください。

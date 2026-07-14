@@ -6,13 +6,13 @@
 
 `monsters.yml` 標準定義：
 
-| ID | 表示名 | エンティティ | HP | 攻撃力 | 防御 | 経験値 | お金 |
-|---|---|---|---|---|---|---|---|
-| `forest_slime` | 森のスライム | SLIME | 15 | 2 | 0 | 5 | 1〜3 |
-| `goblin_raider` | ゴブリンの略奪者 | ZOMBIE | 40 | 5 | 2 | 15 | 5〜12 |
-| `skeletal_archer` | 骸骨の弓兵 | SKELETON | 30 | 4 | 1 | 18 | 6〜14 |
-| `goblin_king` | ゴブリンキング | ZOMBIE | 400 | 12 | 5 | 200 | 100〜250 |
-| `flame_lord` | 業火の王ブレイズロード | BLAZE | 600 | 15 | 8 | 800 | 300〜600 |
+| ID | 表示名 | エンティティ | HP | 攻撃力 | 防御 | 弱点属性 | 経験値 | お金 |
+|---|---|---|---|---|---|---|---|---|
+| `forest_slime` | 森のスライム | SLIME | 15 | 2 | 0 | FIRE | 5 | 1〜3 |
+| `goblin_raider` | ゴブリンの略奪者 | ZOMBIE | 40 | 5 | 2 | なし | 15 | 5〜12 |
+| `skeletal_archer` | 骸骨の弓兵 | SKELETON | 30 | 4 | 1 | なし | 18 | 6〜14 |
+| `goblin_king` | ゴブリンキング | ZOMBIE | 400 | 12 | 5 | なし | 200 | 100〜250 |
+| `flame_lord` | 業火の王ブレイズロード | BLAZE | 600 | 15 | 8 | なし | 800 | 300〜600 |
 
 ## 1. スポーンコマンドの確認
 
@@ -31,6 +31,15 @@
 
 1. `goblin_raider`（攻撃力5）をスポーンさせ、プレイヤーが攻撃を受けたときのダメージがバニラのゾンビダメージではなく5前後（[Status のダメージ計算式](status.md)の軽減も加味）であることを確認する。
 2. モンスター側が被弾した場合、`defense/(defense+100)` の軽減がプレイヤーの攻撃ダメージに適用されること（`defense=5` の `goblin_king` なら約4.8%軽減）を確認する。
+
+## 2.5. 弱点属性（elemental weakness）の確認
+
+`monsters.yml` の `weakness`（省略時 `NONE`）は、攻撃者の手持ち武器の `element`（`items.yml`）が一致した場合にのみ、防御軽減後のダメージへ **1.5倍**の固定倍率を追加で乗せます（`MonsterCombatListener.isWeaknessHit`）。標準定義では `forest_slime` だけが `weakness: FIRE` を持ちます。
+
+1. `element: NONE` の武器（例: `wooden_training_sword`）で `forest_slime` を攻撃し、通常ダメージ（弱点倍率なし）であることを確認する。
+2. `element: FIRE` の武器（例: `flame_longsword`）で同じ `forest_slime` を攻撃し、同条件の1と比べてダメージが1.5倍になっていることを確認する。
+3. `weakness` が設定されていない他のモンスター（`goblin_raider` 等）を `flame_longsword` で攻撃しても倍率が乗らない（`NONE` は弱点ヒット扱いにならない）ことを確認する。
+4. 弱点倍率は防御軽減の**後**に乗算される（`damage *= (1 - reduction)` の後に `*= 1.5`）ため、DEFが高いモンスターに弱点武器で攻撃した場合の最終値を電卓で検算しておくと良い。
 
 ## 3. 撃破報酬の確認（`MonsterDropService.rewardKiller`）
 

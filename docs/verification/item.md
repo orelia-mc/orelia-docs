@@ -8,11 +8,14 @@ OPで検証します。`items.yml` 標準定義のサンプル武器を使いま
 
 | ID | 表示名 | 種別 | Lv | レア度 | 必須職業 |
 |---|---|---|---|---|---|
-| `wooden_training_sword` | 見習いの剣 | SWORD | 1 | COMMON | SWORDSMAN |
-| `flame_longsword` | 紅蓮の長剣 | SWORD | 10 | RARE | SWORDSMAN |
-| `hunters_spear` | 狩人の槍 | SPEAR | 5 | UNCOMMON | SPEARMAN |
+| `wooden_training_sword` | 見習いの剣 | SWORD | 1 | COMMON | FENCER |
+| `flame_longsword` | 紅蓮の長剣 | SWORD | 10 | RARE | FENCER |
+| `hunters_spear` | 狩人の槍 | SPEAR | 5 | UNCOMMON | （なし＝職業不問） |
 | `berserkers_axe` | 狂戦士の斧 | AXE | 8 | RARE | WARRIOR |
 | `hawkeye_bow` | 鷹の眼の弓 | BOW | 6 | UNCOMMON | ARCHER |
+
+!!! note "`hunters_spear` は現状どの職業でも武器ダメージが出ません"
+    `required-job` は未設定（職業不問）ですが、現在の職業ロースター（FENCER/WARRIOR/ARCHER）の `allowed-weapons` にSPEARを含むものが1つも無いため、`JobService.canUseWeaponType` が常にfalseを返します。装備自体は誰でもできますが、通常攻撃・武器スキルともに弾かれるのが現状の仕様です。詳細は [Job の確認手順](job.md) を参照してください。
 
 ## 1. 武器生成コマンド
 
@@ -33,7 +36,7 @@ OPで検証します。`items.yml` 標準定義のサンプル武器を使いま
 
 ## 2. 識別（PDC）の確認
 
-1. 生成した武器を一度インベントリから取り出し、別のスロットに移動 → PDC情報が保持されている（アイテムスタックのNBT/PDCに `weapon_id` タグが残っている）ことを、`/ol status` の装備画面 (`EquipmentGuiScreen`) で手持ち武器として正しく認識されることで間接確認する。
+1. 生成した武器を一度インベントリから取り出し、別のスロットに移動してもPDC情報が保持されている（アイテムスタックのNBT/PDCに `weapon_id` タグが残っている）ことを確認する。`EquipmentGuiScreen`（装備画面）は現時点で `orelia-core`/`orelia-world` のどちらからも開く導線が無い（[GUI の確認手順](gui.md)参照）ため、[Skill の確認手順](skill.md)にある `SkillGuiScreen` 経由で武器が正しく識別されることで代わりに確認すると良い。
 2. バニラの通常アイテム（例: 素手のダイヤの剣）を持った状態で `SkillGuiScreen` を開くと BARRIER（識別不可）表示になり、Orelia武器では正しくスキル一覧が出ることを確認する（`WeaponIdentityService.isOreliaWeapon` の境界確認）。
 
 ## 3. 職業/レベル要件の確認
@@ -41,9 +44,9 @@ OPで検証します。`items.yml` 標準定義のサンプル武器を使いま
 `WeaponRequirementService.meetsRequirements` の確認です。
 
 1. 未就業（職業なし）の状態で `wooden_training_sword` を装備・攻撃しようとし、拒否されることを確認。
-2. `SWORDSMAN` かつレベル1未満はあり得ないので、`flame_longsword`（要Lv10）をレベル1のSWORDSMANに持たせて使用を試み、要件不足で拒否されることを確認。
-3. `SWORDSMAN` でレベル10到達後、同じ武器が使用可能になることを確認。
-4. 職業が一致しない場合（例: `ARCHER` が `hunters_spear` を使用）に拒否されることを確認。
+2. `FENCER` かつレベル1未満はあり得ないので、`flame_longsword`（要Lv10）をレベル1のFENCERに持たせて使用を試み、要件不足で拒否されることを確認。
+3. `FENCER` でレベル10到達後、同じ武器が使用可能になることを確認。
+4. 職業が一致しない場合（例: `ARCHER` が `flame_longsword` を使用）に拒否されることを確認。
 
 ## 4. 強化（enhancement）の確認
 

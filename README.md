@@ -22,6 +22,7 @@ mkdocs build --strict             # site/ にビルド(警告があれば失敗)
 - `docs/core/` — `orelia-core` の各ゲームプレイモジュール(Item / Skill / Job / Status / Accessory / Monster / Boss / Effect / Economy / GUI)と公開 API (`rpg.api.*`)
 - `docs/world/` — `orelia-world` の各コンテンツモジュール(Quest / NPC / Dialogue / Story / Dungeon / Region / CutScene / Event)
 - `docs/extra/` — `orelia-extra` の各機能モジュール(Party / Guild / Trade / Mail / Auction / Housing / Pet / Mount / Ranking / Achievement)
+- `docs/verification/` — プラグイン導入直後の確認手順と、機能ごと(Job / Skill / Item / Status / Accessory / Gathering / Monster / Boss / Economy / GUI / Effect)の実機動作確認手順
 
 ナビゲーションは `mkdocs.yml` の `nav:` で明示的に定義されています。新しいページを追加した場合は必ずここにも追記してください。
 

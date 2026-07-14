@@ -12,7 +12,10 @@
 - `orelia-world` を併用する場合は `OreliaCore` より後に有効化されること（`depend: [OreliaCore]` で保証されるはず）。
 
 !!! tip "モジュールが1つでも死ぬとどうなるか"
-    例えば `Job` モジュールの有効化に失敗すると、後続の `Item`（職業要件チェックに依存）以降がおかしくなる可能性があります。ログにエラーが出ていたら、そのモジュールに対応する `docs/core/*.md` を見て依存関係を確認してください。
+    例えば `Job` モジュールの有効化に失敗すると、後続の `Gathering`/`Item`（職業要件チェックに依存）以降がおかしくなる可能性があります。ログにエラーが出ていたら、そのモジュールに対応する `docs/core/*.md` を見て依存関係を確認してください。現在のモジュール登録順（＝有効化順）は `Database → Status → Job → Gathering → Item → Skill → Accessory → Effect → Economy → Monster → Boss → Gui → Api` です（`Gathering` がJobの直後、Itemの手前に追加されています）。
+
+!!! note "WorldGuardはオプション（softdepend）"
+    `orelia-core` の `plugin.yml` には `softdepend: [WorldGuard]` が追加されています。WorldGuardは必須ではありません。導入していない場合、コンソールに「WorldGuard not found; gathering/farming will not respect region protection.」という情報ログが出るのが正常です（採取/農業のリージョン保護判定が常に許可扱いになるだけで、他機能には影響しません）。
 
 ## 2. データフォルダとconfigの生成確認
 
@@ -25,6 +28,7 @@ plugins/OreliaCore/
   skills.yml
   jobs.yml
   accessories.yml
+  gathering.yml
   monsters.yml
   bosses.yml
   effects.yml
@@ -42,11 +46,14 @@ plugins/OreliaCore/
 
 | コマンド | 期待結果 |
 |---|---|
-| `/ol` | 引数無しでサブコマンド一覧が表示される（少なくとも `item`, `job`, `status`） |
+| `/ol` | 引数無しでサブコマンド一覧が表示される（少なくとも `item`, `job`, `status`, `gathering`） |
 | `/ol job` | 「まだ選択されていません」的なメッセージ、またはエラーなく応答する |
 | `/ol status` | ステータスGUI（27スロット、タイトル「ステータス」）が開く |
+| `/ol gathering` | 採取/農業レベルと一括範囲半径が表示される（初期状態はレベル1・半径0） |
 | `/oladmin` | 使用方法が表示される（OPでない場合は権限エラーメッセージが出ること） |
 | `/oladmin reload` | エラー無く完了し、コンソールに例外が出ないこと |
+
+`/ol`・`/oladmin` とも、途中まで打ってTabキーを押すとサブコマンド名が補完されることも合わせて確認しておくと良いです（`OlRootCommand`/`AdminCommand` が `TabCompleter` を実装済み）。
 
 `/oladmin reload` は全モジュールの config を再読込します（[Configシステム](../architecture/config.md)）。導入直後に一度実行し、エラーが出ないことを確認しておくと、config編集時の事故を早期発見できます。
 
@@ -59,15 +66,21 @@ plugins/OreliaCore/
 
 ## 5. 最初の武器を入手して殴ってみる
 
-1. `/ol job list` — `SWORDSMAN, SPEARMAN, WARRIOR, ARCHER` が表示される。
-2. `orelia-world` のNPC（`JOB_CHANGE`）経由、または未導入の場合はDB/コードでの一時的な検証手段で `SWORDSMAN` になる（`orelia-core` 単体には職業変更コマンドが無いため。詳細は[Job の確認手順](job.md)）。
-3. `/ol item give <自分の名前> wooden_training_sword 1` — 「見習いの剣」がインベントリに入る。
+1. `/ol job list` — `FENCER, WARRIOR, ARCHER` の3種が表示される（`SPEARMAN` は廃止済み、`WARRIOR` はAXE専用になっています。詳細は[Job の確認手順](job.md)）。
+2. 職業に就くには `orelia-world` の `JOB_CHANGE` NPC（`job_master`）が必要です。このNPCは起動時に自動配置されないため、まず `/oladmin spawnnpc job_master` で1体配置してから話しかけてください（`orelia-core` 単体には職業変更コマンドが無いため。詳細は[Job の確認手順](job.md)）。
+3. `FENCER` になった状態で `/ol item give <自分の名前> wooden_training_sword 1` — 「見習いの剣」がインベントリに入る。
 4. モブを殴り、ダメージが通ること（[Status の確認手順](status.md) のダメージ式に沿って計算されているか）。
 
-ここまで確認できれば、Database → Status → Job → Item の基盤モジュールは一通り機能しています。続けて [Job](job.md) / [Skill](skill.md) など個別機能の確認に進んでください。
+ここまで確認できれば、Database → Status → Job → Item の基盤モジュールは一通り機能しています。続けて [Job](job.md) / [Skill](skill.md) / [Gathering](gathering.md) など個別機能の確認に進んでください。
+
+## 6. `orelia-world` 併用時の追加確認
+
+`orelia-world` を導入している場合、参加直後にホットバー右端へ「プレイヤー情報」ネザースターが自動的に固定配置されます。これを右クリックしてメニュー（クエスト/ジョブ/スキル/実績）が開くことを確認してください。特に「スキル」タブは、`orelia-core` 単体では到達手段の無い `SkillGuiScreen`（武器スキルのソケット/習得画面）への唯一の導線になっています（詳細は [Skill の確認手順](skill.md)）。
 
 ## よくある詰まりどころ
 
 - **`/ol item give` が無反応 → コンソールにエラー**: `items.yml` のIDタイプミス。`wooden_training_sword` など実在するIDか確認（[Item の確認手順](item.md)）。
-- **`/ol status` を開くとBARRIERしか出ない場面がある**: `SkillGuiScreen` は「識別可能な武器を手に持っていない」場合にBARRIERを表示する仕様（`StatusGuiScreen` ではなく `SkillGuiScreen` の話なので混同注意）。
+- **職業指南役NPCが見当たらない**: `JOB_CHANGE` タイプNPCだけは起動時自動配置の対象外です。`/oladmin spawnnpc job_master` で手動配置してください（他のNPCは自動配置されるので、この点だけ特別です）。
+- **`SkillGuiScreen` が開けない**: `orelia-core` 単体には到達経路がありません。`orelia-world` の「プレイヤー情報」ネザースター（スキルタブ）経由で開いてください（[Skill の確認手順](skill.md)）。
 - **経済プラグインとの連携がおかしい**: Vaultが導入されていないと `OreliaVaultEconomy` はそもそも登録されません（`EconomyModule.onEnable` はVault未導入時は静かにスキップ）。Vault連携を試す場合はVaultを先に導入してください。
+- **採取/農業でブロックが一括破壊されない**: `/ol gathering` で現在のレベルと一括範囲半径を確認してください。半径0（Lv1-9）の間はシフト+破壊/収穫でも1マスしか処理されません（[Gathering の確認手順](gathering.md)）。
