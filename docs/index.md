@@ -6,21 +6,23 @@
 |---|---|---|
 | [orelia-core](core/index.md) | 戦闘・プレイヤー・ステータスの基盤（Item, Skill, Job, Status, Accessory, Monster, Boss, Effect, Economy, GUI, Database, API） | 実装済み |
 | [orelia-world](world/index.md) | コンテンツ層（Quest, NPC, Dialogue, Story, Dungeon, Region, CutScene, Event） | 実装済み |
-| orelia-extra | 後続 MMORPG 機能（Party, Guild, Trade, ...） | 未実装 |
+| [orelia-extra](extra/index.md) | 後発 MMORPG 機能（Party, Guild, Trade, Mail, Auction, Housing, Pet, Mount, Ranking, Achievement） | 実装済み |
 
-`orelia-world` は `orelia-core` に依存し（`depend: [OreliaCore]`）、**`rpg.api` パッケージ経由でのみ** `orelia-core` と通信します。内部モジュールクラスへ直接アクセスすることはありません。
+`orelia-world` / `orelia-extra` は `orelia-core` に依存し（`depend: [OreliaCore]`）、**`rpg.api` パッケージ経由でのみ** `orelia-core` と通信します。内部モジュールクラスへ直接アクセスすることはありません。`orelia-extra` は `orelia-world` にもソフト依存し（`AchievementModule` の `COMPLETE_QUEST` 条件のみ）、通信は `rpg.world.api.QuestApi` 経由です。
 
 ```mermaid
 graph LR
   world[orelia-world] -->|rpg.api.*| core[orelia-core]
-  extra[orelia-extra 未実装] -.->|rpg.api.*| core
+  extra[orelia-extra] -->|rpg.api.*| core
+  extra -.->|rpg.world.api.QuestApi（ソフト依存）| world
 ```
 
 ## このドキュメントの構成
 
-- **[アーキテクチャ](architecture/overview.md)** — 2プラグイン共通のモジュールシステム、Config、データベース、プレイヤーデータ、コマンド体系
+- **[アーキテクチャ](architecture/overview.md)** — 3プラグイン共通のモジュールシステム、Config、データベース、プレイヤーデータ、コマンド体系
 - **[orelia-core](core/index.md)** — 各ゲームプレイモジュールの仕様と `rpg.api` 公開APIリファレンス
 - **[orelia-world](world/index.md)** — Quest / NPC / Dialogue / Story / Dungeon / Region / CutScene / Event の仕様
+- **[orelia-extra](extra/index.md)** — Party / Guild / Trade / Mail / Auction / Housing / Pet / Mount / Ranking / Achievement の仕様
 
 ## ビルド
 
@@ -28,11 +30,12 @@ graph LR
 ./gradlew build
 ```
 
-両プラグインとも `repo.papermc.io`（Paper API）と `jitpack.io`（Vault API、および orelia-world は orelia-core も jitpack 経由で解決）へのネットワークアクセスが必要です。
+いずれのプラグインも `repo.papermc.io`（Paper API）と `jitpack.io`（Vault API、および orelia-world・orelia-extra は orelia-core も jitpack 経由で解決）へのネットワークアクセスが必要です。
 
 ## リロード
 
 - `orelia-core`: `/oladmin reload`
 - `orelia-world`: `/rpgworldadmin reload`
+- `orelia-extra`: `/oladmin extrareload`
 
 いずれもサーバー再起動なしに全モジュールの設定ファイルを再読込します。

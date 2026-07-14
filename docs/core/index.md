@@ -4,7 +4,7 @@
 
 - **orelia-core**（本体）: Core, Item, Skill, Job, Status, Accessory, Monster, Boss, Effect, Economy, GUI, Database, API, Util
 - `orelia-world`: このプラグインに依存し、`rpg.api` 経由でのみ通信
-- `orelia-extra`（未実装）: 同様に依存予定
+- `orelia-extra`: 同様にこのプラグインへ依存し、`rpg.api` 経由でのみ通信
 
 ## モジュール登録順（＝依存順）
 

@@ -63,14 +63,33 @@ public interface RpgModule {
 !!! note "NpcModule が最後に登録される理由"
     `NpcModule` は `QuestModule` が既に登録済みであることに依存しています（クエスト受付NPCが `QuestProgressService` を参照するため）。新しいモジュールを追加する際は、この依存順を崩さないよう登録位置に注意してください。
 
+## orelia-extra
+
+`rpg.extra.core.OreliaExtraPlugin.onEnable()` が Composition Root です。
+
+1. `ServicesManager` から orelia-core の `PlayerDataManager` と `PlayerCommandRegistry` / `AdminCommandRegistry` を取得 — 見つからなければプラグインを disable してハードフェイル（orelia-core が先に有効化されていることが前提）
+2. 自前の `ConfigManager`（`config.yml` のみ登録） / `SchedulerService` を構築（orelia-core・orelia-world のものとは別インスタンス）
+3. `ExtraAdminCommand` を orelia-core の `AdminCommandRegistry` へ `"extrareload"` として登録（`/oladmin extrareload`。orelia-core自身の `reload` や orelia-world の `worldreload` と衝突しないよう別名にしている）
+4. モジュールをおおむねアルファベット順に登録（`ExtraModuleManager` が管理、登録順=有効化順、逆順で無効化）：
+
+    ```
+    Party → Guild → Trade → Mail → Auction → Housing → Pet → Mount → Ranking → Achievement
+    ```
+
+    モジュール同士に依存関係が無いためアルファベット順で登録されていますが、Ranking と Achievement だけは他モジュール（または orelia-core/orelia-world）が所有する状態を読むだけの立場のため最後に回されています。
+5. `moduleManager.enableAll()`
+
+`ExtraModule` インターフェース（`getName()`, `onEnable(OreliaExtraPlugin)`, `onDisable()`, `onReload()` デフォルト no-op）は orelia-core の `RpgModule` / orelia-world の `WorldModule` と同形ですが、`OreliaExtraPlugin` にパラメータ化された別インターフェースであり、共有はされていません。`reload()` は `configManager.reloadAll()` → `moduleManager.reloadAll()`。
+
 ## 各パッケージの共通レイヤー構造
 
-`item`, `skill`, `job`, `status`, `accessory`, `monster`, `boss`, `effect`, `economy`, `gui`（core）および `quest`, `npc`, `dialogue`, `story`, `dungeon`, `region`, `cutscene`, `event`（world）は、いずれも同じ内部レイヤーに従います。
+`item`, `skill`, `job`, `status`, `accessory`, `monster`, `boss`, `effect`, `economy`, `gui`（core）、`quest`, `npc`, `dialogue`, `story`, `dungeon`, `region`, `cutscene`, `event`（world）、`party`, `guild`, `trade`, `mail`, `auction`, `housing`, `pet`, `mount`, `ranking`, `achievement`（extra）は、いずれも同じ内部レイヤーに従います。
 
-- `repository/` — 純粋なデータアクセス。config駆動（`*.yml` をテンプレートへパース）または DB駆動（`Repository<K,V>` / `SchemaOwner` 実装）。Bukkit イベントやゲームロジックには触れない。
+- `repository/` — 純粋なデータアクセス。config駆動（`*.yml` をテンプレートへパース）または DB駆動（`Repository<K,V>` / `SchemaOwner` 実装）。Bukkit イベントやゲームロジックには触れない。orelia-extra では永続化を持たない Party のように、この層自体が無いモジュールもある。
 - `model/` — 単純なデータ保持クラス（テンプレート、プレイヤーごとのコンポーネント）。
-- `service/` または `manager/` — repository の上に乗るビジネスロジック。
+- `service/` または `manager/` — repository の上に乗るビジネスロジック。orelia-extra では永続化の無いモジュール（Party など）は `manager/` だけで状態を直接持つ。
 - `listener/` — `onEnable` 内で配線される Bukkit イベントハンドラ。
 - `command/` — 共有ディスパッチャ（`/ol`・`/oladmin` または `/rpgworldadmin`・`/rpgquest`・`/dialoguechoice`）に登録される `CommandExecutor`。独自の Bukkit トップレベルコマンドは持たない。
+- `gui/` — GUI画面を持つモジュールのみ（core の Gui、world の Quest、extra の Auction/Mail/Ranking など）。
 
-新しいモジュールを追加する場合は、この形（`QuestModule`/`DungeonModule` など）を踏襲し、`onEnable` 内で必要な依存を `ServicesManager`/`ModuleManager` から取得し、ハード依存が欠けていれば `IllegalStateException` で即座に失敗させます。
+新しいモジュールを追加する場合は、この形（`QuestModule`/`DungeonModule`/`GuildModule` など）を踏襲し、`onEnable` 内で必要な依存を `ServicesManager`/`ModuleManager` から取得し、ハード依存が欠けていれば `IllegalStateException` で即座に失敗させます。
