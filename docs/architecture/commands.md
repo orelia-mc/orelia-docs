@@ -10,7 +10,7 @@
 `orelia-core` の権限ノードは `orelia.admin` の1つのみです。サブコマンド単位の権限は宣言されていません。
 
 !!! warning "orelia-world は独自のトップレベルコマンドを持たない"
-    どちらの `plugin.yml` にも `commands:` セクションはありません。`/rpgworldadmin`・`/rpgquest`・`/dialoguechoice` という独立トップレベルコマンドは存在せず、`orelia-world` の全コマンドは `/ol`・`/oladmin` のサブコマンドとして登録されています（下記「`orelia-world` が登録するサブコマンド」参照）。加えて `quest` は [`CommandAliasUtil`](#動的コマンドエイリアスcommandaliasutil) 経由で `/quest` としても実行できます。
+    どちらの `plugin.yml` にも `commands:` セクションはありません。`/rpgworldadmin`・`/rpgquest`・`/dialoguechoice` という独立トップレベルコマンドは存在せず、`orelia-world` の全コマンドは `/ol`・`/oladmin` のサブコマンドとして登録されています（下記「`orelia-world` が登録するサブコマンド」参照）。加えて `quest` は [`CommandAliasUtil`](#commandaliasutil) 経由で `/quest` としても実行できます。
 
 ## `/ol` と `/oladmin` の設計思想
 
@@ -23,7 +23,7 @@
 
 ## `/ol help` / `/oladmin help`
 
-`args[0]` が省略されているか `help` の場合、両ディスパッチャーは `CommandHelpUtil.sendHelp(sender, label, entries, page)` に委譲します。`entries` は登録済みの `OlCommandRegistry.Entry` 一覧（`/oladmin` の場合は `reload`/`spawn`/`spawnboss`/`spawnpoint` のハードコードされたビルトインエントリーに `AdminCommandRegistry` の登録内容を追加したもの）で、`/ol help [page]` / `/oladmin help [page]` の2つ目の引数（数値でなければ1ページ目扱い）でページを指定できます。表示は共通の [`Pagination`](#ページングpagination) に委譲され、各行は `/<rootLabel> <usage>&%7 - <description>` の形式です。
+`args[0]` が省略されているか `help` の場合、両ディスパッチャーは `CommandHelpUtil.sendHelp(sender, label, entries, page)` に委譲します。`entries` は登録済みの `OlCommandRegistry.Entry` 一覧（`/oladmin` の場合は `reload`/`spawn`/`spawnboss`/`spawnpoint` のハードコードされたビルトインエントリーに `AdminCommandRegistry` の登録内容を追加したもの）で、`/ol help [page]` / `/oladmin help [page]` の2つ目の引数（数値でなければ1ページ目扱い）でページを指定できます。表示は共通の [`Pagination`](#rpgcorecommandpagination) に委譲され、各行は `/<rootLabel> <usage>&%7 - <description>` の形式です。
 
 ## 共通コマンドユーティリティ（`rpg.core.command`）
 
@@ -31,7 +31,7 @@
 
 ### お金のフォーマット（`rpg.util.MoneyFormat`）
 
-`MoneyFormat.format(double)` はGUI/スコアボード/チャット/プレースホルダーで金額を表示する共通フォーマッタです。1000未満はそのまま（整数でなければ小数第1位まで）、以降は桁ごとに `k`（千）→`m`（百万）→`b`（十億）→`t`（一兆）表記に切り替わります（例: `1500` → `1.5k`、`2000000` → `2m`、`3_000_000_000` → `3b`、`4_000_000_000_000` → `4t`）。負数には `-` 符号を残します。`ShopGuiScreen` の価格lore・購入成功メッセージが `MoneyFormat` に統一されました（詳細は [Economy モジュール](../core/economy.md#表示フォーマット)）。
+`MoneyFormat.format(double)` はGUI/スコアボード/チャット/プレースホルダーで金額を表示する共通フォーマッタです。1000未満はそのまま（整数でなければ小数第1位まで）、以降は桁ごとに `k`（千）→`m`（百万）→`b`（十億）→`t`（一兆）表記に切り替わります（例: `1500` → `1.5k`、`2000000` → `2m`、`3_000_000_000` → `3b`、`4_000_000_000_000` → `4t`）。負数には `-` 符号を残します。`ShopGuiScreen` の価格lore・購入成功メッセージが `MoneyFormat` に統一されました（詳細は [Economy モジュール](../core/economy.md#moneyformat)）。
 
 ### ページング（`rpg.core.command.Pagination`）
 

@@ -4,7 +4,7 @@
 
 ## `ConfigManager`
 
-- `register(String fileName)` — `computeIfAbsent` で管理。`plugin.getResource(name) != null` であれば `plugin.saveResource(name, false)` でjar同梱のデフォルトを（上書きせず）コピーし、`new ConfigFile(logger, dataFolder, fileName)` を構築。ファイルが**既に存在していた**場合（＝新規コピーではなく既存ユーザーファイル）は、続けて [config-version 自動マイグレーション](#config-version-自動マイグレーション) を実行する。
+- `register(String fileName)` — `computeIfAbsent` で管理。`plugin.getResource(name) != null` であれば `plugin.saveResource(name, false)` でjar同梱のデフォルトを（上書きせず）コピーし、`new ConfigFile(logger, dataFolder, fileName)` を構築。ファイルが**既に存在していた**場合（＝新規コピーではなく既存ユーザーファイル）は、続けて [config-version 自動マイグレーション](#config-version) を実行する。
 - `get(String fileName)` — 未登録なら `IllegalStateException("Config file not registered: ...")`。
 - `reload(String fileName)` / `reloadAll()` — 登録済み全ファイルに対し `ConfigFile::reload` を呼ぶ。
 - `getRegisteredFileNames()` — 登録済み全ファイル名（デバッグAPI `DebugApi` 向け）。
@@ -90,7 +90,7 @@ monster:
 - テンプレート中の `{name}` トークンは `format`/`send` の可変長引数（`name, value, name, value, ...` の順）で位置ベースに置換されます。
 - 未定義キーは例外を投げず、キー自体を `??key??` で囲んで返します（タイポがゲーム内表示で即座に分かる）。
 - `send(sender, key, ...)` は `getPrefix()` を前置し、`sendRaw(sender, key, ...)` は複数行の一覧やGUIタイトルなど prefix 不要な場面向け。
-- 色付けは [`ColorUtil`](commands.md#カスタムカラーコードcolorutil) の `&` コード（vanillaレガシー・`&#RRGGBB` ヘックス・`&%<char>` カスタムコードいずれも）に対応します。
+- 色付けは [`ColorUtil`](commands.md#colorutil) の `&` コード（vanillaレガシー・`&#RRGGBB` ヘックス・`&%<char>` カスタムコードいずれも）に対応します。
 
 ## orelia-world `config.yml` の実際のキー
 

@@ -125,7 +125,7 @@ monsters:
 
 ## Scaled Health（モンスターの体力スケーリング）
 
-`monsters.yml` の `hp`（フレイムロードのようなボス格だと数百〜数千まで届く）は、バニラの `Attribute.MAX_HEALTH` に安全に収まる範囲を超え得ます。そのため `MonsterSpawnService.spawn` は `Attribute.MAX_HEALTH` を `min(data.getHp(), config.yml: combat.scaled-health.vanilla-cap)`（デフォルト1024）に設定するだけで、**モンスターの本当の現在HPは別途PDC（`MonsterKeys.scaledCurrentHp()`）で管理**します。プレイヤー側の同じ仕組みは [Status モジュール仕様の Scaled Health](status.md#scaled-health-プレイヤーの体力スケーリング) を参照してください。
+`monsters.yml` の `hp`（フレイムロードのようなボス格だと数百〜数千まで届く）は、バニラの `Attribute.MAX_HEALTH` に安全に収まる範囲を超え得ます。そのため `MonsterSpawnService.spawn` は `Attribute.MAX_HEALTH` を `min(data.getHp(), config.yml: combat.scaled-health.vanilla-cap)`（デフォルト1024）に設定するだけで、**モンスターの本当の現在HPは別途PDC（`MonsterKeys.scaledCurrentHp()`）で管理**します。プレイヤー側の同じ仕組みは [Status モジュール仕様の Scaled Health](status.md#scaled-health) を参照してください。
 
 - `CombatDamageListener` が被弾ごとに `MonsterSpawnService.applyScaledCombatDamage(entity, data, scaledDamage)` を呼び、スケール済み現在HPだけを減算する（バニラ体力は同リスナーが `ScaledHealthService.convertDamageToVanilla` で変換した量を `event.setDamage` に渡すことで、Bukkit標準のダメージ処理（ノックバック・被弾音・死亡判定）を通して更新される）。
 - 落下ダメージ等 `EntityDamageByEntityEvent` を経由しない環境ダメージは `MonsterHealthBarListener` から `MonsterSpawnService.applyEnvironmentalDamage` が呼ばれ、実際に減ったバニラ体力の割合をスケール済みHP側にもミラーする。
@@ -138,7 +138,7 @@ monsters:
 
 ## 弱点属性（Elemental Weakness）
 
-`monsters.yml` の `weakness`（省略時 `NONE`）は、攻撃者の手持ち武器の `element`（`items.yml`）が一致した場合にのみ、DEF軽減後・クリティカル判定後のダメージへさらに固定 `x1.5`（`DamageFormula.DEFAULT_WEAKNESS_MULTIPLIER`）を乗算します。`weakness: NONE`（デフォルト）や、武器の `element` が一致しない場合は倍率なし。計算パイプライン全体は [`CombatDamageListener` 統一ダメージパイプライン](#combatdamagelistener-統一ダメージパイプライン)を参照してください。
+`monsters.yml` の `weakness`（省略時 `NONE`）は、攻撃者の手持ち武器の `element`（`items.yml`）が一致した場合にのみ、DEF軽減後・クリティカル判定後のダメージへさらに固定 `x1.5`（`DamageFormula.DEFAULT_WEAKNESS_MULTIPLIER`）を乗算します。`weakness: NONE`（デフォルト）や、武器の `element` が一致しない場合は倍率なし。計算パイプライン全体は [`CombatDamageListener` 統一ダメージパイプライン](#combatdamagelistener)を参照してください。
 
 ## 通常モンスターの能動アビリティ（`MonsterAbilityCastService`）
 

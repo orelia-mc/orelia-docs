@@ -74,7 +74,7 @@ bosses:
 
 - **`BossEncounterListener`**（`EntityDamageEvent` MONITOR, `EntityDeathEvent`） — フェーズ演出（半径 `BROADCAST_RADIUS=48.0` 内へブロードキャスト + EXPLOSIONパーティクル）を発火し、`hp% <= enrageHpPercent` で狂暴化を設定（`hp%` はバニラ体力=Scaled Healthに追従してスケール済みHPと同じ割合になるため、通常の割合計算で問題ない）
 - **`BossEnrageListener`**（`LOW`、`monster` モジュールの `CombatDamageListener`（`LOW`）より後に登録され、その処理済みダメージをさらに乗算する） — 攻撃者が狂暴化ボスならダメージに `enrageDamageMultiplier` を乗算
-- **`BossFireballHitListener`** — `EntityExplodeEvent` からブロックダメージを除去し、`ProjectileHitEvent` で半径内のプレイヤーにダメージ。通常モンスターの `FIREBALL_BARRAGE` アビリティ（`MonsterAbilityCastService`、[Monster モジュール仕様](monster.md#通常モンスターの能動アビリティmonsterabilitycastservice)参照）も同じメタデータキー（`BossAbilityCastService.FIREBALL_METADATA`）を使って着弾判定を共有する
+- **`BossFireballHitListener`** — `EntityExplodeEvent` からブロックダメージを除去し、`ProjectileHitEvent` で半径内のプレイヤーにダメージ。通常モンスターの `FIREBALL_BARRAGE` アビリティ（`MonsterAbilityCastService`、[Monster モジュール仕様](monster.md#monsterabilitycastservice)参照）も同じメタデータキー（`BossAbilityCastService.FIREBALL_METADATA`）を使って着弾判定を共有する
 
 ## HP/ダメージ表示・弱点属性・Scaled Health
 

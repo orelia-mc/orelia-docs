@@ -2,7 +2,7 @@
 
 レベル/経験値の進行と、派生する戦闘ステータス（HP, SP, ATK, DEF, CRT, CRT_DMG, SPD の7種。AGI/DEX/INTは削除済み）、およびHP/SP自然回復を管理します。他の全モジュールは独自に計算せず、`StatusService` 経由で有効ステータスを読みます。**登録順2番目（Databaseの次）の、他モジュールに依存しない基盤モジュール**です。
 
-実際のダメージ計算パイプライン（ATK% → DEF軽減 → クリティカル → 属性弱点）は `rpg.status.combat.DamageFormula`（純粋な計算ロジック）と、それを呼び出す `rpg.monster.listener.CombatDamageListener`（唯一のBukkitイベントリスナー、`monster` モジュール側で登録）に一本化されています。詳細は [Monster モジュール仕様](monster.md#combatdamagelistener-統一ダメージパイプライン) を参照してください。`status` モジュール自身はATK/DEF/CRT/CRT_DMGの値をステータスとして計算・提供するだけで、ダメージイベント自体は処理しません（旧 `CombatStatusListener` は撤去済み）。
+実際のダメージ計算パイプライン（ATK% → DEF軽減 → クリティカル → 属性弱点）は `rpg.status.combat.DamageFormula`（純粋な計算ロジック）と、それを呼び出す `rpg.monster.listener.CombatDamageListener`（唯一のBukkitイベントリスナー、`monster` モジュール側で登録）に一本化されています。詳細は [Monster モジュール仕様](monster.md#combatdamagelistener) を参照してください。`status` モジュール自身はATK/DEF/CRT/CRT_DMGの値をステータスとして計算・提供するだけで、ダメージイベント自体は処理しません（旧 `CombatStatusListener` は撤去済み）。
 
 ## ドメインモデル
 
@@ -90,7 +90,7 @@ status:
 - **`applyEnvironmentalDamage(UUID, vanillaAmount)`** — 落下/落雷/溺れなど `CombatDamageListener` を通らないダメージ（`ScaledHealthEnvironmentalDamageListener` から呼ばれる）は、実際にバニラ体力へ加わった割合を `currentHp` 側にもミラーする。
 - **`damage`/`heal`/`tickRegen`/`addExperience`** はいずれも変更後に `syncVanillaHealth` を呼び、バニラ体力を追従させる。
 
-`ScaledHealthJoinListener` が参加時にバニラ体力を初期同期し、`ScaledHealthRegenListener` が自然回復のたびに同期します。モンスター/ボス側の同種の仕組みは [Monster モジュール仕様](monster.md#scaled-health-モンスターの体力スケーリング) を参照してください。
+`ScaledHealthJoinListener` が参加時にバニラ体力を初期同期し、`ScaledHealthRegenListener` が自然回復のたびに同期します。モンスター/ボス側の同種の仕組みは [Monster モジュール仕様](monster.md#scaled-health) を参照してください。
 
 ## 永続化
 

@@ -17,7 +17,7 @@
 /oladmin spawnboss goblin_king_boss
 ```
 
-期待結果: `MonsterSpawnService.spawn` に委譲され、`goblin_king`（ZOMBIE, HP400, 攻撃力12, 防御5）と全く同じ見た目・基礎ステータスでスポーンし、加えて `BossAbilityCastService` へ登録される（フェーズ・狂暴化・アビリティの対象になる）。バニラ体力は [Monster の Scaled Health](../core/monster.md#scaled-health-モンスターの体力スケーリング) と同じ仕組みで `min(hp, vanilla-cap)` に設定され、HPバー・フローティングダメージ数値も通常モンスターと同様に表示される（[Monster の確認手順](monster.md#3-hpバーフローティングダメージ数値の確認)参照）。
+期待結果: `MonsterSpawnService.spawn` に委譲され、`goblin_king`（ZOMBIE, HP400, 攻撃力12, 防御5）と全く同じ見た目・基礎ステータスでスポーンし、加えて `BossAbilityCastService` へ登録される（フェーズ・狂暴化・アビリティの対象になる）。バニラ体力は [Monster の Scaled Health](../core/monster.md#scaled-health) と同じ仕組みで `min(hp, vanilla-cap)` に設定され、HPバー・フローティングダメージ数値も通常モンスターと同様に表示される（[Monster の確認手順](monster.md#3-hp)参照）。
 
 - `BossModule` を経由しない `/oladmin spawn goblin_king`（通常のMonsterコマンド）でスポーンさせた場合は、ボス演出（フェーズ・狂暴化）が発動**しない**ことを比較確認する（ボス演出は `spawnboss` 経由のみ）。HPバー・ダメージ数値表示・Scaled Healthはボス経由/通常湧き経由のどちらでも変わらず動作することも合わせて確認する。
 
@@ -32,7 +32,7 @@
 ## 3. 狂暴化の確認（`BossEnrageListener`）
 
 1. `goblin_king_boss` のHPを25%以下まで削る。
-2. 狂暴化状態になった以降、ボスからプレイヤーへのダメージが通常時の1.75倍になっていることを実測ダメージで確認する（[統一ダメージパイプライン](monster.md#2-被弾時のダメージ計算の確認combatdamagelistener)で計算済みのダメージ（ATK%→DEF軽減→クリティカル→属性弱点まで適用済み）に対して、`BossEnrageListener` がさらに1.75倍を乗算する2段構えであることを踏まえ、通常時攻撃力12ベースの理論値と比較する）。
+2. 狂暴化状態になった以降、ボスからプレイヤーへのダメージが通常時の1.75倍になっていることを実測ダメージで確認する（[統一ダメージパイプライン](monster.md#2-combatdamagelistener)で計算済みのダメージ（ATK%→DEF軽減→クリティカル→属性弱点まで適用済み）に対して、`BossEnrageListener` がさらに1.75倍を乗算する2段構えであることを踏まえ、通常時攻撃力12ベースの理論値と比較する）。
 3. `flame_lord_boss` でも同様にHP25%以下で2.0倍になることを確認する。
 
 ## 4. 周期アビリティの確認（`flame_lord_boss` のみ）
@@ -41,7 +41,7 @@
 
 1. `flame_lord_boss` をスポーンし、24ブロック以内に留まる。
 2. `meteor_slam`（AOE_SLAM、ダメージ18、半径6、クールダウン12秒）が発動すると、`&c業火の王が地面を叩きつけた！` のメッセージと共に近くのプレイヤーへ直接ダメージが入ることを確認する。
-3. `fire_barrage`（FIREBALL_BARRAGE、ダメージ10、半径3、クールダウン8秒）が発動すると、プレイヤーごとに `SmallFireball` が飛んでくることを確認する。着弾時にブロック破壊が起きない（`EntityExplodeEvent` からブロックダメージが除去される仕様）ことも確認する。この着弾判定（`BossFireballHitListener`）は通常モンスターの `FIREBALL_BARRAGE` アビリティ（[Monster の確認手順](monster.md#5-通常モンスターの能動アビリティの確認monsterabilitycastservice)）とも共有されている実装なので、通常モンスター側の火球でも同じ挙動になることを余力があれば比較確認する。
+3. `fire_barrage`（FIREBALL_BARRAGE、ダメージ10、半径3、クールダウン8秒）が発動すると、プレイヤーごとに `SmallFireball` が飛んでくることを確認する。着弾時にブロック破壊が起きない（`EntityExplodeEvent` からブロックダメージが除去される仕様）ことも確認する。この着弾判定（`BossFireballHitListener`）は通常モンスターの `FIREBALL_BARRAGE` アビリティ（[Monster の確認手順](monster.md#5-monsterabilitycastservice)）とも共有されている実装なので、通常モンスター側の火球でも同じ挙動になることを余力があれば比較確認する。
 4. 同時に発動するアビリティは最大1つ（同tickで2つ同時発火しない）ことを確認する。
 5. クールダウン中は同じアビリティが再発動しないことを、発動直後にすぐ範囲内へ留まって確認する（`meteor_slam` なら12秒、`fire_barrage` なら8秒は再発動しない）。
 6. 24ブロックより離れるとアビリティが発動しなくなることを確認する。
