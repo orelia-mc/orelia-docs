@@ -33,14 +33,16 @@
 - `getFile()` — バッキングファイルを返す。
 
 !!! warning "スレッドセーフではない"
-    リロードはメインスレッドで `/oladmin reload` / `/rpgworldadmin reload` からのみ発生する前提です。
+    リロードはメインスレッドで `/oladmin reload` / `/oladmin worldreload` からのみ発生する前提です。
 
 ## リロードコマンド
+
+`orelia-world` は独立したトップレベルコマンドを持たず、`/oladmin` の `AdminCommandRegistry` へ `worldreload` として登録しています（[コマンド体系](commands.md)参照）。
 
 | プラグイン | コマンド | 動作 |
 |---|---|---|
 | orelia-core | `/oladmin reload` | `configManager.reloadAll()` → `moduleManager.reloadAll()` |
-| orelia-world | `/rpgworldadmin reload` | `configManager.reloadAll()` → `moduleManager.reloadAll()` |
+| orelia-world | `/oladmin worldreload` | `configManager.reloadAll()` → `moduleManager.reloadAll()` |
 
 ## orelia-core `config.yml` の実際のキー
 
