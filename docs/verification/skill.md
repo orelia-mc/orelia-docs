@@ -57,9 +57,9 @@
 各テストで以下を確認します。
 
 1. `SkillCastService.cast` が成功する（`CastFailure` が返らない）こと。
-2. 発動中は通常の武器攻撃ダメージ処理が抑制される（`orelia_skill_active` メタデータによる抑制、`WeaponUseListener` 側の仕様）こと。
+2. 発動中は `orelia_skill_active`（`DamageFormula.SKILL_OVERRIDE_METADATA`）メタデータがキャスターに一時的に立ち、`CombatDamageListener` がbase attack power/ATK%を通常武器攻撃として再計算せず、スキル側の計算済み値をそのまま使う（DEF/クリティカル/弱点のみ対象ごとに解決する）こと。
 3. `effect-particle`（表に記載）が視覚的に発火すること。
-4. `damage-multiplier` に応じたダメージが通常攻撃より明確に大きいこと（例: `slash` は1.4倍、`iaijutsu` は2.2倍）。
+4. `damage-multiplier` に応じたダメージが通常攻撃より明確に大きいこと（例: `slash` は1.4倍、`iaijutsu` は2.2倍）。武器の`weapon-level`（`/ol item levelup` で上げた場合、`config.yml: weapon-level.attack-power-factor` 分ずつ上昇）が `WeaponIdentityService.baseAttackPower` に織り込まれているため、武器レベルを上げるとスキルダメージも通常攻撃と同じ比率で伸びることを合わせて確認する（[Item の確認手順](item.md)の武器レベル参照）。
 5. `scaledDamageMultiplier(level) = damageMultiplier * (1 + 0.1 * max(0, level - 1))` により、レベルを上げるとダメージがわずかに増えること（レベル1→5で最大40%増）。
 
 ## 3. `CastFailure` 各パターンの確認
@@ -87,7 +87,7 @@
 ## 5. 矢系スキル固有の確認
 
 - **`multi_shot`**（`ArrowVolleyExecutor`）: メタデータ `orelia_skill_arrow_multiplier` が矢に付与され、`ArrowSkillDamageListener` によりダメージ倍率（1.2倍）が適用されること。3本の矢がそれぞれ独立して命中判定・ダメージ計算されることを確認する。
-- **`explosive_arrow`**（`ExplosiveArrowExecutor`）: メタデータ `orelia_skill_explosive_arrow` = `double[]{amount, radius}` が付与され、`ExplosiveArrowHitListener`（`ProjectileHitEvent`）で着弾時に半径3.0のAoEダメージが発生すること。ブロックへの着弾でも爆発すること、プレイヤー未命中でも起爆自体はすることを確認する。
+- **`explosive_arrow`**（`ExplosiveArrowExecutor`）: メタデータ `orelia_skill_explosive_arrow` = `double[]{amount, radius}` が付与され、`ExplosiveArrowHitListener`（`ProjectileHitEvent`）で着弾時に半径3.0のAoEダメージが発生すること。ブロックへの着弾でも爆発すること、プレイヤー未命中でも起爆自体はすることを確認する。爆発ダメージが `scaledDamageMultiplier(level) * 4.0` どおりの値になっており、**キャスターの手持ち武器の通常攻撃力で上書きされていないこと**を必ず確認する（過去に、`SKILL_OVERRIDE_METADATA` を立て忘れて `CombatDamageListener` が通常武器攻撃とみなし、実ダメージが武器の `attack-power` で上書きされてしまう不具合があり、修正済み。回帰確認の意味も込めて、爆裂矢のダメージが武器の通常攻撃力と明確に異なる値であることを確認するとよい）。
 
 ## 異常系・エッジケース
 

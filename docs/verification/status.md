@@ -33,23 +33,36 @@
 
 ## 3. ダメージ計算式の確認
 
-`CombatStatusListener` が `EntityDamageByEntityEvent` を処理します。
+ダメージイベント自体を処理するのは `status` モジュールではなく、`rpg.monster.listener.CombatDamageListener`（`LOW` 優先度、`monster` モジュール側で登録）です。旧 `CombatStatusListener` は撤去され、`WeaponUseListener`/`MonsterCombatListener` と合わせて1本の `CombatDamageListener` に統一されています。計算ロジック自体は Bukkit非依存の `rpg.status.combat.DamageFormula.compute` に切り出されており、`status` はATK/DEF/CRT/CRT_DMGの値を提供するだけです。固定順序は次のとおりです（詳細・検証手順は [Monster の確認手順](monster.md#2-combatdamagelistener)を参照）：
 
 ```
-damage *= 1 + attackerATK / 100
-reduction = victimDEF / (victimDEF + 100)
-damage *= (1 - reduction)
+1. base attack power（武器/素手/モンスター/スキルの基礎値）
+2. -> ATK%: damage *= 1 + attackerATK / 100
+3. -> DEF軽減: reduction = victimDEF / (victimDEF + 100); damage *= (1 - reduction)
+4. -> クリティカル判定・倍率（命中時のみ）
+5. -> 属性弱点（モンスターの weakness 一致時のみ x1.5、[Monster の弱点属性](monster.md#25-elemental-weakness)参照）
 ```
 
-1. ATK/DEFが分かっている状態（職業パッシブ・装備補正を含めた `/ol status` の最終値）で、モンスターへの1発分ダメージを実測し、上記式のとおりか電卓で検算する。
+1. ATK/DEFが分かっている状態（職業パッシブ・装備補正を含めた `/ol status` の最終値）で、モンスターへの1発分ダメージを実測し、上記式のとおりか電卓で検算する（クリティカル/弱点が乗らない条件で確認するのが簡単）。
 2. DEFが高い相手ほどダメージ軽減が大きくなる（式の反比例的な性質: DEF100で50%軽減）ことを、DEFの異なる2体のモンスターで比較確認する。
+3. CRT（クリティカル率）・CRT_DMG（クリティカルダメージ加算%）を上げた状態で攻撃を繰り返し、`baseCritMultiplier + critDmgPercent/100` 倍のダメージが確率的に混ざることを確認する（武器の `crit-rate`/`crit-multiplier` は `items.yml` 側、プレイヤーのCRT/CRT_DMGは `status` 側の値が合算される）。
 
 ## 4. HP/SP自然回復の確認
 
 `config.yml: status.regen`（デフォルト `hp-percent-per-tick: 0.5`, `sp-percent-per-tick: 1.0`, `period-ticks: 100` = 5秒間隔）。
 
 1. HP/SPを意図的に減らす（モンスターに攻撃されるか、スキルを使ってSPを消費する）。
-2. 何もせず約5秒待ち、`/ol status` を開き直してHPが最大値の0.5%、SPが1.0%回復していることを確認する（`currentHp += maxHp * pct / 100` でクランプされ、最大値を超えないこと）。
+2. 何もせず約5秒待ち、`/ol status` を開き直してHPが最大値の0.5%、SPが1.0%回復していることを確認する（`currentHp += maxHp * pct / 100` でクランプされ、最大値を超えないこと）。`tickRegen` はスケール済みHPを更新した後 `ScaledHealthService.syncVanillaHealth` でバニラ体力（ハート表示）も同じ割合に同期するため、ハート表示も一緒に回復していることを確認する。
+
+## 4.5. Scaled Health（体力スケーリング）の確認
+
+`StatType.HP` はレベル・装備・バフで数百に達することがありますが、バニラの `Attribute.MAX_HEALTH` は小さい範囲にしか収まりません。`rpg.status.service.ScaledHealthService` がバニラ体力を常にスケール済みHPと同じ割合に保ちます（詳細は [Status モジュール仕様の Scaled Health](../core/status.md#scaled-health)）。
+
+1. レベルアップ等で最大HPが大きい状態（例: `StatType.HP` が数百）でも、画面上のハート表示（バニラ体力）は通常の範囲（0〜20相当）に収まっていることを確認する。
+2. ダメージを受けたとき、ハート表示の減り方とスケール済みHP（`/ol status` の数値表示があれば）の割合が一致していることを確認する（例えば最大HPの25%を失ったら、ハートも約25%減る）。
+3. 装備の変更等で最大HPが変化した直後、`currentHp` 自体は変化しないままハート表示の**割合**が変わる（最大値が増えれば相対的にハートが低く見える）ことを確認する（`reconcileScaledHealth` の仕様どおり、現在HPの絶対値維持を優先し、割合の見た目は変わる）。
+4. 死亡演出中（death screen 表示中）に何らかの理由でHPが再計算されても、画面が復活したように誤動作しない（`ScaledHealthService.syncVanillaHealth` は `entity.isDead()` の間は何もしない）ことを確認する。
+5. モンスター/ボス側の同じ仕組みは [Monster の確認手順](monster.md#1)を参照。
 
 ## 5. バフの適用順（フラット→パーセント）の確認
 

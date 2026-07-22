@@ -20,7 +20,7 @@ OPで検証します。`items.yml` 標準定義のサンプル武器を使いま
 ## 1. 武器生成コマンド
 
 ```
-/ol item give <自分の名前> wooden_training_sword 1
+/oladmin item give <自分の名前> wooden_training_sword 1
 ```
 
 期待結果:
@@ -28,7 +28,7 @@ OPで検証します。`items.yml` 標準定義のサンプル武器を使いま
 - インベントリに「見習いの剣」が1本追加される。
 - アイテムのLore/名前に `items.yml` の `description`・レア度カラー（COMMONの色）が反映されている。
 - 個数指定を省略した場合は `1` 本になる（デフォルト値）。
-- 存在しないID（例: `/ol item give <自分> nonexistent_sword`）を渡すとエラーメッセージが返り、アイテムは生成されない。
+- 存在しないID（例: `/oladmin item give <自分> nonexistent_sword`）を渡すとエラーメッセージが返り、アイテムは生成されない。
 - 実行者以外のオンラインプレイヤー名を指定して正しく相手に渡ること。
 
 !!! note "権限チェックなし"
@@ -48,7 +48,18 @@ OPで検証します。`items.yml` 標準定義のサンプル武器を使いま
 3. `FENCER` でレベル10到達後、同じ武器が使用可能になることを確認。
 4. 職業が一致しない場合（例: `ARCHER` が `flame_longsword` を使用）に拒否されることを確認。
 
-## 4. 強化（enhancement）の確認
+## 4. 武器レベルシステムの確認
+
+`WeaponIdentityService.baseAttackPower` = `attack-power(items.yml) * (1 + weaponLevel * attack-power-factor) * enhancementMultiplier`。強化（5.項目・下記）とは独立した別軸です。
+
+1. `wooden_training_sword`（`items.yml` の `level: 1`）を生成し、`/oladmin item levelup` を実行する。武器を何も持っていない状態、またはバニラアイテムを持った状態で実行するとレベルアップが拒否される（`item.not-holding-weapon`）ことを確認する。
+2. Orelia武器を手に持って `/oladmin item levelup` を実行し、レベルが1つ上がる（`item.weapon-leveled-up`）こと、およびLoreの `Lv. N` 表示とアイテムの攻撃力表示（小数第1位に丸め）が即座に更新されることを確認する。
+3. デフォルト設定（`config.yml: weapon-level.initial-cap: 5`）では、プレイヤーレベル10未満のプレイヤーは武器レベル5が上限であることを確認する。レベル5の状態でさらに `/oladmin item levelup` を実行すると `item.weapon-level-capped` が返り、レベルが変化しないことを確認する。
+4. プレイヤーレベルを10以上に上げた状態で同じ武器の `/oladmin item levelup` を試み、上限が10（`tier-step` 刻み）まで伸びていることを確認する（プレイヤーレベル20到達後は上限20、というように段階的に伸びることも余裕があれば確認）。
+5. 武器レベルが上がるほど、通常攻撃・武器スキル双方のダメージが `baseAttackPower` の増加分だけ大きくなることを（[Status のダメージ計算式](status.md)と合わせて）確認する。武器レベルと強化（5.項目）は乗算で重なるため、両方を上げた状態でダメージが単純合算ではなく積で増えることも確認する。
+6. `orelia-world` に武器レベルアップNPC（`rpg.api.ItemApi#getWeaponLevelCap`/`#levelUpWeapon`/`#refreshWeaponLore` を使用）が実装されている場合は、そちらのUI経由でも同様の結果になることを確認する（[NPC モジュール](../world/npc.md)参照）。`orelia-core` 単体では `/oladmin item levelup` が唯一の手動確認手段です。
+
+## 5. 強化（enhancement）の確認
 
 `WeaponIdentityService.enhance` はPDC `enhancement_level` をインクリメントし、`enhancementMultiplier = 1.0 + level * 0.1` をダメージ計算に反映します。
 
@@ -56,7 +67,7 @@ OPで検証します。`items.yml` 標準定義のサンプル武器を使いま
 2. 強化後、武器のLore等に強化レベルが反映されているか、または攻撃時のダメージが強化前より約10%/レベル増えているかを確認する（[Status のダメージ計算式](status.md)と合わせて確認）。
 3. `orelia-core` 単体（`orelia-world` 未導入）では強化を試す標準UIが無いため、この項目はスキップして構いません。
 
-## 5. 売却価格・レアリティ・属性表示の確認
+## 6. 売却価格・レアリティ・属性表示の確認
 
 各サンプル武器を生成し、Lore/アイテム名に以下が反映されていることを目視確認します。
 
@@ -68,5 +79,5 @@ OPで検証します。`items.yml` 標準定義のサンプル武器を使いま
 
 ## 異常系・エッジケース
 
-- `/ol item give` に個数として負数や0を渡した場合の挙動（想定外の値なので、エラー・無視・そのまま処理される、のいずれかを確認して記録しておく）。
+- `/oladmin item give` に個数として負数や0を渡した場合の挙動（想定外の値なので、エラー・無視・そのまま処理される、のいずれかを確認して記録しておく）。
 - 同じ武器を複数所持した状態でスキルスロット数（`skill-slot-count`）がスタック単位ではなく**アイテム個体**単位で管理されているか（ソケット済みスキルはPDC文字列としてアイテムに直接書き込まれるため、スタック不可になるはず）を [Skill の確認手順](skill.md) と合わせて確認する。

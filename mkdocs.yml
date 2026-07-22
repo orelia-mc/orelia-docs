@@ -100,6 +100,10 @@ nav:
       - Mount: extra/mount.md
       - Ranking: extra/ranking.md
       - Achievement: extra/achievement.md
+  - orelia-debug:
+      - 概要: debug/index.md
+  - orelia-serverutil:
+      - 概要: serverutil/index.md
   - 動作確認:
       - 概要: verification/index.md
       - プラグイン導入直後の確認: verification/post-install.md

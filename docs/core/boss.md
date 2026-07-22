@@ -72,10 +72,14 @@ bosses:
 
 ## リスナー
 
-- **`BossEncounterListener`**（`EntityDamageEvent` MONITOR, `EntityDeathEvent`） — フェーズ演出（半径 `BROADCAST_RADIUS=48.0` 内へブロードキャスト + EXPLOSIONパーティクル）を発火し、`hp% <= enrageHpPercent` で狂暴化を設定
-- **`BossEnrageListener`**（`LOW`、モンスターの攻撃ハンドラの後） — 攻撃者が狂暴化ボスならダメージに `enrageDamageMultiplier` を乗算
-- **`BossFireballHitListener`** — `EntityExplodeEvent` からブロックダメージを除去し、`ProjectileHitEvent` で半径内のプレイヤーにダメージ
+- **`BossEncounterListener`**（`EntityDamageEvent` MONITOR, `EntityDeathEvent`） — フェーズ演出（半径 `BROADCAST_RADIUS=48.0` 内へブロードキャスト + EXPLOSIONパーティクル）を発火し、`hp% <= enrageHpPercent` で狂暴化を設定（`hp%` はバニラ体力=Scaled Healthに追従してスケール済みHPと同じ割合になるため、通常の割合計算で問題ない）
+- **`BossEnrageListener`**（`LOW`、`monster` モジュールの `CombatDamageListener`（`LOW`）より後に登録され、その処理済みダメージをさらに乗算する） — 攻撃者が狂暴化ボスならダメージに `enrageDamageMultiplier` を乗算
+- **`BossFireballHitListener`** — `EntityExplodeEvent` からブロックダメージを除去し、`ProjectileHitEvent` で半径内のプレイヤーにダメージ。通常モンスターの `FIREBALL_BARRAGE` アビリティ（`MonsterAbilityCastService`、[Monster モジュール仕様](monster.md#monsterabilitycastservice)参照）も同じメタデータキー（`BossAbilityCastService.FIREBALL_METADATA`）を使って着弾判定を共有する
+
+## HP/ダメージ表示・弱点属性・Scaled Health
+
+ボスも `monsters.yml` のエントリをそのまま使う以上、[Monster モジュール仕様](monster.md)のHPバー・フローティングダメージ数値・弱点属性・Scaled Health（バニラ体力の安全な範囲へのスケーリング）・統一ダメージパイプライン（`DamageFormula`/`CombatDamageListener`）はボスにもそのまま適用されます。`BossEnrageListener` の狂暴化倍率は、この `CombatDamageListener` が計算し終えたダメージ（ATK%→DEF軽減→クリティカル→属性弱点まで適用済み）にさらに乗算する形です。
 
 ## 他モジュールへの依存
 
-`monster`（`MonsterModule`, `MonsterSpawnService.spawn`/`idOf`）へのハード依存のみ。`skill`/`effect`/`item` へは**意図的に**依存しません（`BossAbility` のJavadocに、`SkillData` とは意図的に分離している旨の記載あり）。
+`monster`（`MonsterModule`, `MonsterSpawnService.spawn`/`idOf`、`CombatDamageListener`/`DamageFormula` によるダメージ計算）へのハード依存のみ。`skill`/`effect`/`item` へは**意図的に**依存しません（`BossAbility` のJavadocに、`SkillData` とは意図的に分離している旨の記載あり）。
