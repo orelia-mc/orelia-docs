@@ -82,12 +82,12 @@ monsters:
       war_cry_slam:
         name: "雄叫びの一撃"
         type: AOE_SLAM
-        damage: 6
-        radius: 4
+        damage: 8
+        radius: 3
         cooldown-seconds: 10
         particle: SWEEP_ATTACK
-        sound: ENTITY_ZOMBIE_ATTACK_IRON_DOOR
-        announce-message: "&cゴブリンの略奪者が雄叫びを上げた！"
+        sound: ENTITY_ZOMBIE_ATTACK_WOODEN_DOOR
+        announce-message: "&%eゴブリンの略奪者が雄叫びを上げた！"
 
   goblin_king:
     name: "ゴブリンキング"
