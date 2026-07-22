@@ -68,7 +68,7 @@ weapons:
 
 ## 武器レベルシステム（`weapon-level`）
 
-`orelia-core` #27 で新設。既存の「強化」（enhancement、上限なし、`강化屋`NPC専用）とは別に、**武器レベル**という概念が追加されました。武器インスタンス（`ItemStack`）ごとにPDC `weapon_level` タグへ個別に記録され、`items.yml` の静的 `level:` を初期値として `WeaponIdentityService#levelUp` でプレイヤーが後から個別にレベルアップさせていきます。
+`orelia-core` #27 で新設。既存の「強化」（enhancement、上限なし、`強化屋`NPC専用）とは別に、**武器レベル**という概念が追加されました。武器インスタンス（`ItemStack`）ごとにPDC `weapon_level` タグへ個別に記録され、`items.yml` の静的 `level:` を初期値として `WeaponIdentityService#levelUp` でプレイヤーが後から個別にレベルアップさせていきます。
 
 ### 基礎攻撃力の算出
 

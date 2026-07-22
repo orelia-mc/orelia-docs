@@ -89,7 +89,9 @@ quests:
 
 ## コマンド
 
-`QuestCommand` → `/rpgquest list`（進行中クエストと状態を表示）、`/rpgquest abandon <id>`（報酬無しで放棄）
+`QuestCommand` → `/ol quest list`（進行中クエストと状態を表示）、`/ol quest abandon <id>`（報酬無しで放棄）
+
+`f5e4d99` で、`/quest` を `/ol quest` のショートカットエイリアスとして直接実行できるようになりました（`QuestModule#onEnable` が `plugin.getPlayerCommandRegistry().register("quest", ...)` に加えて `CommandAliasUtil.registerAlias(plugin, "quest", questCommand, ...)` を呼び出し、orelia-core側の新しい動的エイリアス基盤にトップレベルコマンド `/quest` を登録）。挙動・サブコマンド（`list`/`abandon <id>`）・タブ補完は `/ol quest` と完全に同一で、同じ `QuestCommand` インスタンスが両方を処理します。
 
 ## GUI
 

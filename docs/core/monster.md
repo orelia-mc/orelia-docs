@@ -12,11 +12,21 @@ class MonsterData {
     EntityType entityType;
     double hp, attackPower, defense;
     ElementType element;
+    ElementType weakness;      // NONE=弱点なし。一致する属性の武器で攻撃すると被ダメージ x1.5
     AiType aiType;
     List<DropEntry> drops;
     long expReward;
     double moneyMin, moneyMax;
-    List<String> skillIds;
+    List<MonsterAbility> abilities; // 通常モンスターの能動アビリティ（後述）
+    double critRate, critMultiplier; // 省略時 0（常時非クリティカル）/1.5
+}
+
+class MonsterAbility {
+    String id, name;
+    MonsterAbilityType type;   // AOE_SLAM | FIREBALL_BARRAGE（bossパッケージのBossAbilityと同形）
+    double damage, radius;
+    int cooldownSeconds;
+    String particle, sound, announceMessage;
 }
 
 class DropEntry {
@@ -39,6 +49,46 @@ class MonsterSpawnPoint {
 
 ```yaml
 monsters:
+  forest_slime:
+    name: "森のスライム"
+    entity-type: SLIME
+    hp: 15
+    attack-power: 2
+    defense: 0
+    element: NONE
+    weakness: FIRE       # element: FIRE の武器で攻撃すると被ダメージ x1.5（DEF軽減後に乗算）
+    ai-type: AGGRESSIVE
+    exp-reward: 5
+    money-min: 1
+    money-max: 3
+    drops:
+      slime_ball: { vanilla-material: SLIME_BALL, chance-percent: 60, min-amount: 1, max-amount: 2 }
+
+  goblin_raider:
+    name: "ゴブリンの略奪者"
+    entity-type: ZOMBIE
+    hp: 40
+    attack-power: 5
+    defense: 2
+    element: NONE
+    ai-type: AGGRESSIVE
+    exp-reward: 15
+    money-min: 5
+    money-max: 12
+    drops:
+      rotten_flesh: { vanilla-material: ROTTEN_FLESH, chance-percent: 80, min-amount: 1, max-amount: 2 }
+      training_sword: { weapon-id: wooden_training_sword, chance-percent: 5, min-amount: 1, max-amount: 1 }
+    abilities:                 # 通常モンスターの能動アビリティ（MonsterAbilityCastService、後述）
+      war_cry_slam:
+        name: "雄叫びの一撃"
+        type: AOE_SLAM
+        damage: 6
+        radius: 4
+        cooldown-seconds: 10
+        particle: SWEEP_ATTACK
+        sound: ENTITY_ZOMBIE_ATTACK_IRON_DOOR
+        announce-message: "&cゴブリンの略奪者が雄叫びを上げた！"
+
   goblin_king:
     name: "ゴブリンキング"
     entity-type: ZOMBIE
@@ -53,8 +103,11 @@ monsters:
     drops:
       flame_longsword: { weapon-id: flame_longsword, chance-percent: 15, min-amount: 1, max-amount: 1 }
       emerald: { vanilla-material: EMERALD, chance-percent: 100, min-amount: 3, max-amount: 8 }
-    skills: []
+    # abilities は設定しない — bosses.yml の monster-id からも参照されるモンスターに abilities を
+    # 設定すると、ボスとして湧いたときに BossAbilityCastService と衝突しうるため意図的に避ける
 ```
+
+`weakness` は省略時 `NONE`（弱点なし）。`crit-rate`（省略時0=常時非クリティカル）・`crit-multiplier`（省略時1.5、`crit-rate > 0` のときのみ意味を持つ）も任意キーとして追加できます。`abilities` は `bosses.yml` の `abilities` ブロックと同じ形（`type: AOE_SLAM | FIREBALL_BARRAGE`）です。`monsters.yml` のコメントは、`bosses.yml` の `monster-id` として参照されているモンスターID（`goblin_king`, `flame_lord`）に `abilities` を設定しないよう明記しています——`MonsterAbilityCastService` への登録は `BossModule.spawn()` を経由しない湧き経路（スポーンポイント、`/oladmin monster spawn`）でのみ行われるため実害はありませんが、意図が分かりにくくなるための運用上の注意です。
 
 ## サービス
 
