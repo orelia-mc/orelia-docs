@@ -58,7 +58,7 @@
 
 ### `/ol` のディスパッチ（`OlRootCommand`）
 
-引数なし → `registry.getNames()` の一覧を表示。`args[0]` を registry から検索し、見つかれば `label + " " + args[0]` とラベルを付け替えて残り引数（`Arrays.copyOfRange(args,1,...)`）を転送。見つからなければ `"Unknown subcommand: X"`。
+引数なし、または `args[0]` が `help` → [`/ol help`](#ol-help-oladmin-help) を表示。それ以外は `args[0]` を registry から検索し、見つかれば `label + " " + args[0]` とラベルを付け替えて残り引数（`Arrays.copyOfRange(args,1,...)`）を転送。見つからなければ `"Unknown subcommand: X. Try /<label> help."`。タブ補完（`onTabComplete`）は `registry.getNames()` + `"help"` の前方一致候補を返し、2階層目以降は該当サブコマンドの `TabCompleter` に委譲する。
 
 ### `/oladmin` のディスパッチ（`AdminCommand`）
 
@@ -70,23 +70,32 @@
 - `spawnpoint add <monsterId> [intervalSeconds=30] [maxAlive=3]` / `spawnpoint remove <id>` / `spawnpoint list` → `MonsterModule.getSpawnPointService()`
 - それ以外 → `registry.get(args[0])` に転送。見つからなければ使用方法を表示
 
-!!! info "AdminCommandRegistry への登録はゼロ"
-    orelia-core内では `AdminCommandRegistry` へ登録されるサブコマンドは1つもありません。`/oladmin` の全アクションは `AdminCommand` のswitch文で直接処理されています。
+全ての固定メッセージ（`admin.reloaded`、`admin.usage-spawn`、`command.unknown-subcommand` 等）はハードコード文字列ではなく `plugin.getMessageManager()`（`messages.yml`、詳細は [Config システム](config.md#messagesyml)）経由で送られます。`/ol`・`/oladmin` の他のコマンド実装も同様です。
+
+`AdminCommandRegistry` への登録は0ではなくなりました。`orelia-core` は `item` を、`orelia-world` は `npc`・`spawnnpc`・`worldreload` を登録しています（下表参照）。`/oladmin` の `reload`/`spawn`/`spawnboss`/`spawnpoint` の4つだけは今も `AdminCommand` のswitch文で直接処理されています（`BUILTIN_ENTRIES` として `/oladmin help` にもハードコードで表示される）。
 
 ### orelia-core が登録する `/ol` サブコマンド
 
 | サブコマンド | 登録元 | 使い方 |
 |---|---|---|
-| `item` | `ItemModule` → `ItemCommand` | `/ol item give <player> <id> [amount]` |
 | `job` | `JobModule` → `JobCommand` | `/ol job` / `/ol job list`（職業変更はNPC経由。このコマンドでは行わない） |
-| `status` | `GuiModule` → `StatusCommand` | `/ol status`（ステータスGUIを開く） |
+| `status` | `GuiModule` → `StatusCommand` | `/ol status`（ステータスGUIを開く）。`/status` としても実行可（`CommandAliasUtil`） |
+| `gathering` | `GatheringModule` → `GatheringCommand` | `/ol gathering`（採取/農業レベルと一括範囲を確認） |
 
-### orelia-world が持つ独自コマンド
+### orelia-core が登録する `/oladmin` サブコマンド
 
-`orelia-world` は `/ol`・`/oladmin` へサブコマンドを追加するのではなく、独自のトップレベルコマンドを`plugin.yml`で宣言しています。
-
-| コマンド | 実装 | 使い方 |
+| サブコマンド | 登録元 | 使い方 |
 |---|---|---|
-| `/rpgworldadmin reload` | `WorldAdminCommand` | `OreliaWorldPlugin.reload()` を呼ぶ（現時点で唯一のサブコマンド） |
-| `/rpgquest` | `QuestCommand` | `/rpgquest list`（進行中クエストと状態を表示）、`/rpgquest abandon <id>`（報酬なしで放棄） |
-| `/dialoguechoice <index>` | `DialogueChoiceCommand` | チャット上のクリック可能な選択肢から内部的に呼ばれる。プレイヤーが直接打つことは想定しない |
+| `item` | `ItemModule` → `ItemCommand` | `/oladmin item give <player> <id> [amount]`、`/oladmin item levelup`（手に持った武器を強化）。#38で `/ol item` から管理者操作向けに `/oladmin item` へ統合された |
+
+### orelia-world が登録するサブコマンド
+
+`orelia-world` は独自のトップレベルコマンドを持たず（`plugin.yml` に `commands:` 宣言は無い）、`/ol`・`/oladmin` の共有レジストリへサブコマンドとして登録します。
+
+| サブコマンド | 登録先 | 登録元 | 使い方 |
+|---|---|---|---|
+| `quest` | `/ol` | `QuestModule` → `QuestCommand` | `/ol quest list`（進行中クエストと状態を表示）、`/ol quest abandon <id>`（報酬なしで放棄）。`CommandAliasUtil` により `/quest` としても実行可（実装の詳細は `docs/world/quest.md` 参照） |
+| `dialoguechoice` | `/ol` | `DialogueModule` → `DialogueChoiceCommand` | チャット上のクリック可能な選択肢から内部的に呼ばれる。プレイヤーが直接打つことは想定しない |
+| `npc` | `/oladmin` | `NpcModule` → `NpcAdminCommand` | NPC管理 |
+| `spawnnpc` | `/oladmin` | `NpcModule` → `NpcSpawnCommand` | NPCのスポーン |
+| `worldreload` | `/oladmin` | `WorldAdminCommand`（`OreliaWorldPlugin.reload()`） | `/oladmin worldreload`。`orelia-core` 自身の `reload` と名前が衝突しないよう `worldreload` という名前で登録されている |
