@@ -164,6 +164,12 @@ monsters:
 
 スキル発動によるダメージ（`rpg.skill.executor.SkillDamage`）は、攻撃者に `DamageFormula.SKILL_OVERRIDE_METADATA` メタデータを立てることで、`CombatDamageListener` に「base attack power + ATK%までは計算済み」と伝え、DEF/クリティカル/弱点だけを対象ごとに解決させます（AOE/コーン系スキルが複数対象に同じ基礎ダメージを一度だけ計算し、対象ごとの防御力差はそれぞれ反映するため）。
 
+## その他のリスナー
+
+- **`MonsterDeathListener`** — スポーン地点のスロットを解放。プレイヤーによる撃破ならバニラのドロップ/経験値をクリアし `rewardKiller` を呼ぶ
+- **`VanillaHostileSpawnBlockerListener`** — `CreatureSpawnEvent` を理由 `NATURAL`/`SPAWNER` かつ `Monster` エンティティに限りキャンセル。`config.yml: monster.disable-vanilla-hostile-spawning`（デフォルト true）でゲート
+- **`MonsterSunImmunityListener`** — タグ付きOreliaモンスターの日照による自然発火（`EntityCombustEvent` の基底クラスそのもの、溶岩/炎ブロックや他エンティティ由来のサブクラスは対象外）をキャンセルする
+
 ## 他モジュールへの依存
 
 - **item** — `ElementType`, `ItemManager.createWeapon`（ドロップ用）、`WeaponIdentityService`（`CombatDamageListener` が武器の base attack power／クリティカル値を解決するため）

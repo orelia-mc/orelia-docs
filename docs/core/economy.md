@@ -35,6 +35,10 @@ player_economy (uuid VARCHAR(36) PRIMARY KEY, balance DOUBLE NOT NULL DEFAULT 0)
 
 `config.yml: economy.starting-balance`（デフォルト 100.0）を読み込み、"Vault" プラグインが存在する場合のみ `OreliaVaultEconomy` を `Bukkit.getServicesManager()` に `ServicePriority.Normal` で登録します。
 
+## 表示フォーマット
+
+金額の画面表示（GUI/スコアボード/チャット/プレースホルダー）は `rpg.util.MoneyFormat.format(double)` に統一されています。1000未満はそのまま（整数でなければ小数第1位まで）表示し、以降は `k`（千）→`m`（百万）→`b`（十億）→`t`（一兆）の単位に切り替わります（例: `1500` → `1.5k`、`2000000` → `2m`、`3_000_000_000` → `3b`、`4_000_000_000_000` → `4t`）。`ShopGuiScreen` の価格lore・購入成功メッセージが `MoneyFormat` を使っています。**内部の残高（DB・`EconomyService`/`EconomyRepository` の全メソッド）は常に生の `double` のままで、丸め処理は表示側だけに限定されます。**
+
 ## 他モジュールへの依存/被依存
 
 `DatabaseModule` を必須とします。`monster`（撃破時のお金報酬）、`gui`（ショップの購入/売却）、および外部プラグイン（Vault経由）から利用されます。
