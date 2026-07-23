@@ -1,4 +1,4 @@
-<img src="https://orelia-mc.github.io/assets/logo_wide.jpg" />
+![orelia-docs](https://socialify.git.ci/orelia-mc/orelia-docs/image?description=1&language=1&name=1&owner=1&theme=Dark)
 <h1 align="center">Orelia Docs</h1>
 <p align="center">Documentation of Orelia-MC</p>
 
