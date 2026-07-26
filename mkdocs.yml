@@ -78,6 +78,7 @@ nav:
       - Effect: core/effect.md
       - Economy: core/economy.md
       - GUI: core/gui.md
+      - Gathering: core/gathering.md
   - orelia-world:
       - 概要: world/index.md
       - Quest: world/quest.md
