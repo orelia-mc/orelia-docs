@@ -22,3 +22,6 @@ Oreliaのサーバー管理者コマンドは、動いているプラグイン�
 - [orelia-debug テストプレイ支援](debug-tools.md)
 - [orelia-serverutil](serverutil.md)
 - [コマンド一覧(早見表)](reference.md)
+- [設定ファイルの書き方(config.yml)](config-guide.md)
+- [設定ファイルの書き方(コンテンツ定義)](content-files.md)
+- [ゲーム内ロジック](game-logic.md)
