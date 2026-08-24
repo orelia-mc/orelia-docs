@@ -1,5 +1,5 @@
 site_name: Orelia Documentation
-site_description: Orelia Minecraft RPG プラグイン群の仕様書
+site_description: Orelia Minecraft RPG プラグインの遊び方・管理者ガイド
 site_url: https://orelia-mc.github.io/orelia-docs/
 repo_name: orelia-mc/orelia-docs
 repo_url: https://github.com/orelia-mc/orelia-docs
@@ -58,64 +58,23 @@ markdown_extensions:
 
 nav:
   - ホーム: index.md
-  - アーキテクチャ:
-      - 3プラグイン構成: architecture/overview.md
-      - モジュールライフサイクル: architecture/module-lifecycle.md
-      - Config システム: architecture/config.md
-      - データベース層: architecture/database.md
-      - プレイヤーデータ: architecture/player-data.md
-      - コマンド体系: architecture/commands.md
-  - orelia-core:
-      - 概要: core/index.md
-      - 公開API (rpg.api): core/api.md
-      - Item: core/item.md
-      - Skill: core/skill.md
-      - Job: core/job.md
-      - Status: core/status.md
-      - Accessory: core/accessory.md
-      - Monster: core/monster.md
-      - Boss: core/boss.md
-      - Effect: core/effect.md
-      - Economy: core/economy.md
-      - GUI: core/gui.md
-      - Gathering: core/gathering.md
-  - orelia-world:
-      - 概要: world/index.md
-      - Quest: world/quest.md
-      - NPC: world/npc.md
-      - Dialogue: world/dialogue.md
-      - Story: world/story.md
-      - Dungeon: world/dungeon.md
-      - Region: world/region.md
-      - CutScene: world/cutscene.md
-      - Event: world/event.md
-  - orelia-extra:
-      - 概要: extra/index.md
-      - Party: extra/party.md
-      - Guild: extra/guild.md
-      - Trade: extra/trade.md
-      - Mail: extra/mail.md
-      - Auction: extra/auction.md
-      - Housing: extra/housing.md
-      - Pet: extra/pet.md
-      - Mount: extra/mount.md
-      - Ranking: extra/ranking.md
-      - Achievement: extra/achievement.md
-  - orelia-debug:
-      - 概要: debug/index.md
-  - orelia-serverutil:
-      - 概要: serverutil/index.md
-  - 動作確認:
-      - 概要: verification/index.md
-      - プラグイン導入直後の確認: verification/post-install.md
-      - Job: verification/job.md
-      - Skill: verification/skill.md
-      - Item: verification/item.md
-      - Status: verification/status.md
-      - Accessory: verification/accessory.md
-      - Gathering: verification/gathering.md
-      - Monster: verification/monster.md
-      - Boss: verification/boss.md
-      - Economy: verification/economy.md
-      - GUI: verification/gui.md
-      - Effect: verification/effect.md
+  - 遊び方:
+      - はじめに: play/index.md
+      - レベル・ステータス・職業: play/growth.md
+      - 戦闘・武器スキル: play/combat.md
+      - 装備・アイテム: play/items.md
+      - クエスト・NPC: play/quest.md
+      - ダンジョン: play/dungeon.md
+      - パーティー・ギルド・フレンド: play/social.md
+      - チャット: play/chat.md
+      - 経済(ショップ・トレード・オークション・メール): play/economy.md
+      - 実績・ランキング・称号: play/progress.md
+      - 住居・ペット・乗り物: play/housing.md
+      - 採取(釣り・木こり・採掘・農業): play/gathering.md
+      - コマンド一覧: play/commands.md
+  - 管理者ガイド:
+      - 概要: admin/index.md
+      - orelia-core 管理コマンド: admin/core-commands.md
+      - orelia-debug テストプレイ支援: admin/debug-tools.md
+      - orelia-serverutil: admin/serverutil.md
+      - コマンド一覧: admin/reference.md

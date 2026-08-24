@@ -4,7 +4,7 @@
 
 ## About
 
-`orelia-docs` is the [MkDocs Material](https://squidfunk.github.io/mkdocs-material/)-based documentation site for the Minecraft RPG plugin suite **Orelia**. It contains no plugin source code — only specs written by reading the sibling repos `orelia-core` / `orelia-world` / `orelia-extra` / `orelia-debug` / `orelia-serverutil`.
+`orelia-docs` is the [MkDocs Material](https://squidfunk.github.io/mkdocs-material/)-based documentation site for the Minecraft RPG plugin **Orelia**. It's a **player how-to-play guide and a server-admin command reference**, not internal-implementation documentation. It contains no plugin source code — only command specs and in-game behavior written by reading the sibling repos `orelia-core` (the single merged plugin) / `orelia-debug` (testplay tooling) / `orelia-serverutil` (server operations).
 
 Live site: https://orelia-mc.github.io/orelia-docs/
 
@@ -18,13 +18,8 @@ mkdocs build --strict             # build to site/ (fails on any warning)
 
 ## Structure
 
-- `docs/architecture/` — design shared by all three plugins: module lifecycle, the Config system, the DB layer, player data, and the command system
-- `docs/core/` — each gameplay module of `orelia-core` (Item / Skill / Job / Status / Accessory / Monster / Boss / Effect / Economy / GUI) and the public API (`rpg.api.*`)
-- `docs/world/` — each content module of `orelia-world` (Quest / NPC / Dialogue / Story / Dungeon / Region / CutScene / Event)
-- `docs/extra/` — each feature module of `orelia-extra` (Party / Guild / Trade / Mail / Auction / Housing / Pet / Mount / Ranking / Achievement)
-- `docs/debug/` — overview and command reference for `orelia-debug`, the admin-only testplay/debug tooling plugin
-- `docs/serverutil/` — overview for `orelia-serverutil`, the server-operations/UX plugin that's independent of the RPG suite
-- `docs/verification/` — post-install checklist and per-feature in-game verification steps (Job / Skill / Item / Status / Accessory / Gathering / Monster / Boss / Economy / GUI / Effect)
+- `docs/play/` — the player guide: growth/status/jobs, combat/weapon skills, items/equipment, quest/NPC, dungeons, party/guild/friend, chat, economy (shops/trade/auction/mail), achievements/ranking/titles, housing/pet/mount, gathering, and a player command reference
+- `docs/admin/` — the admin guide: `orelia-core`'s built-in `/oladmin` commands, `orelia-debug`'s (optional) testplay tooling, `orelia-serverutil`'s `/suadmin`/`/hub`, and an admin command reference
 
 Navigation is explicitly defined in `mkdocs.yml`'s `nav:`. Any new page must be added there too.
 

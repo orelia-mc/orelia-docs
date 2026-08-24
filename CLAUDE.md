@@ -1,10 +1,12 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when working from this repository.
 
 ## What this is
 
-`orelia-docs` is the MkDocs Material documentation site for the Orelia Minecraft RPG plugin suite. It documents two sibling repositories that live alongside this one (`../orelia-core`, `../orelia-world`) — this repo contains no plugin source code itself, only hand-written specs derived from reading that source.
+`orelia-docs` is the MkDocs Material documentation site for the Orelia Minecraft RPG plugin suite. It is a **player and server-admin facing guide**, not developer/architecture documentation — how to play (leveling, jobs, quests, dungeons, parties/guilds, trading, ...) and how to run admin commands (what to type, what it does), not how the plugin is implemented internally (no class names, no data models, no SQL schemas). This repo contains no plugin source code itself.
+
+The suite it documents is `../orelia-core` (the single merged plugin — formerly split across orelia-core/orelia-world/orelia-extra, now one jar), plus two optional companion plugins: `../orelia-debug` (admin-only testplay/debug tooling) and `../orelia-serverutil` (RPG-independent server-ops/UX).
 
 ## Commands
 
@@ -20,18 +22,19 @@ mkdocs build --strict             # build to site/ — fails on any warning (bro
 
 Navigation is defined in `mkdocs.yml` (`nav:`), not inferred from the filesystem — any new page must be added there explicitly or it won't appear in the site.
 
-- `docs/architecture/` — cross-cutting design shared by both plugins: module lifecycle (`RpgModule`/`WorldModule`, registration order = dependency order, enable forward / disable reverse), the `ConfigManager`/`ConfigFile` config system, the shared SQLite/MySQL database layer (`Repository`/`SchemaOwner`), the `PlayerData`/`PlayerDataComponent` per-player state system, and the `/ol` · `/oladmin` · `/rpgworldadmin` command dispatchers.
-- `docs/core/` — one page per `orelia-core` gameplay module (Item, Skill, Job, Status, Accessory, Monster, Boss, Effect, Economy, GUI), plus `core/api.md` documenting every `rpg.api.*` interface method — this is the **only** integration surface `orelia-world`/`orelia-extra` are allowed to call into `orelia-core` through.
-- `docs/world/` — one page per `orelia-world` content module (Quest, NPC, Dialogue, Story, Dungeon, Region, CutScene, Event), each noting which `rpg.api.*` interfaces it consumes.
+- `docs/play/` — the player guide, one page per system a player actually interacts with (growth/status/jobs, combat/weapon skills, items/equipment, quest/NPC, dungeon, party/guild/friend, chat, economy, achievements/ranking/titles, housing/pet/mount, gathering), plus a player command quick-reference table.
+- `docs/admin/` — the admin guide, one page per plugin's admin command surface (`orelia-core`'s built-in `/oladmin` commands, `orelia-debug`'s testplay tooling — also under `/oladmin`, `orelia-serverutil`'s separate `/suadmin`/`/hub`), plus an admin command quick-reference table. Each command gets its own heading with syntax, required permission (usually just "`/oladmin` needs `orelia.admin`, default OP" stated once, not repeated per command), effect, and an example.
 
 ## Keeping docs accurate
 
-This documentation was written by reading `orelia-core`/`orelia-world` source directly (model fields, YAML config keys, service method behavior, formulas), not by paraphrasing existing docs or guessing from class names. When updating a page after upstream code changes:
+This documentation is written by reading the actual command classes and `messages.yml` in the sibling repos (`../orelia-core`, `../orelia-debug`, `../orelia-serverutil`) — the exact `case`/`switch` branches a command dispatches on, not by paraphrasing an old registration description string (those can drift out of date, e.g. a command's one-line description in its `AdminCommandRegistry.register(...)` call not being updated when a new subcommand like `config view` was added later — always verify against the command class's actual `onCommand` logic).
 
-- Re-read the actual source/config in the sibling repo rather than editing prose speculatively.
-- Preserve the existing per-module structure (domain model → real YAML example → services/formulas → commands → cross-module API usage) so pages stay consistent with each other.
+When updating a page after upstream code changes:
+
+- Re-read the actual command source in the sibling repo rather than editing prose speculatively.
+- Keep the level of detail practical (command syntax, GUI button layout, what happens, a real example) — not implementation detail (class/field names, service method signatures, SQL schemas, damage formulas). If you find yourself describing a Java class, it belongs in that repo's own `CLAUDE.md`/README, not here.
+- `orelia-debug`'s bundled command descriptions still say things like "(要OreliaWorld)" ("requires OreliaWorld") from before the 3-plugin merge — that's stale (everything is bundled into `orelia-core` now), don't propagate it into this site's prose.
 - If you find a documented behavior that no longer matches the source, fix the doc — the sibling repos are the source of truth, this repo is derived from them.
-- A few known integration gaps are intentionally documented as such (e.g. `orelia-world`'s dungeon-clear not yet triggering quest `CLEAR_DUNGEON` objectives, `EventScheduleService` multipliers not yet applied to reward grants) — don't silently "fix" these in the docs by describing wiring that doesn't exist in the code.
 
 ## Committing changes
 

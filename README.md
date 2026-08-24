@@ -2,7 +2,7 @@
 
 ## About
 
-`orelia-docs` は Minecraft RPG プラグイン群 **Orelia** の [MkDocs Material](https://squidfunk.github.io/mkdocs-material/) 製ドキュメントサイトです。プラグイン本体のソースコードは含まず、隣接リポジトリ `orelia-core` / `orelia-world` / `orelia-extra` / `orelia-debug` / `orelia-serverutil` を読んで書き起こした仕様書のみを収録しています。
+`orelia-docs` は Minecraft RPG プラグイン **Orelia** の [MkDocs Material](https://squidfunk.github.io/mkdocs-material/) 製ドキュメントサイトです。**プレイヤー向けの遊び方ガイドと、サーバー管理者向けのコマンドリファレンス** で構成されており、内部実装の仕様書ではありません。プラグイン本体のソースコードは含まず、隣接リポジトリ `orelia-core`(統合済みの単一プラグイン本体) / `orelia-debug`(テストプレイ支援) / `orelia-serverutil`(サーバー運用) のコマンド仕様・ゲーム内挙動を読んで書き起こしています。
 
 公開サイト: https://orelia-mc.github.io/orelia-docs/
 
@@ -16,13 +16,8 @@ mkdocs build --strict             # site/ にビルド(警告があれば失敗)
 
 ## Structure
 
-- `docs/architecture/` — モジュールライフサイクル、Config システム、DB 層、プレイヤーデータ、コマンド体系など 3 プラグイン共通の設計
-- `docs/core/` — `orelia-core` の各ゲームプレイモジュール(Item / Skill / Job / Status / Accessory / Monster / Boss / Effect / Economy / GUI)と公開 API (`rpg.api.*`)
-- `docs/world/` — `orelia-world` の各コンテンツモジュール(Quest / NPC / Dialogue / Story / Dungeon / Region / CutScene / Event)
-- `docs/extra/` — `orelia-extra` の各機能モジュール(Party / Guild / Trade / Mail / Auction / Housing / Pet / Mount / Ranking / Achievement)
-- `docs/debug/` — 管理者向けテストプレイ／デバッグ支援プラグイン `orelia-debug` の概要とコマンド一覧
-- `docs/serverutil/` — RPGスイートとは独立したサーバー運用・UXプラグイン `orelia-serverutil` の概要
-- `docs/verification/` — プラグイン導入直後の確認手順と、機能ごと(Job / Skill / Item / Status / Accessory / Gathering / Monster / Boss / Economy / GUI / Effect)の実機動作確認手順
+- `docs/play/` — プレイヤー向けガイド。レベル/ステータス/職業、戦闘・武器スキル、装備・アイテム、クエスト・NPC、ダンジョン、パーティー・ギルド・フレンド、チャット、経済(ショップ・トレード・オークション・メール)、実績・ランキング・称号、住居・ペット・乗り物、採取、コマンド一覧
+- `docs/admin/` — 管理者向けガイド。`orelia-core`組み込みの`/oladmin`コマンド、任意導入の`orelia-debug`(テストプレイ支援)コマンド、`orelia-serverutil`の`/suadmin`・`/hub`、コマンド一覧
 
 ナビゲーションは `mkdocs.yml` の `nav:` で明示的に定義されています。新しいページを追加した場合は必ずここにも追記してください。
 

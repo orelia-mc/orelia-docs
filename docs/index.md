@@ -1,41 +1,22 @@
 # Orelia Documentation
 
-**Orelia** は Paper 1.21.x (Java 21) 向けの Minecraft RPG プラグイン群です。単一の巨大プラグインではなく、責務ごとに分割された複数プラグインの構成になっています。
+**Orelia** は Paper 1.21.x 向けの Minecraft RPG プラグインです。バニラのMinecraftワールドに、レベル・ステータス・職業・スキル・クエスト・ダンジョン・パーティー/ギルド・トレードなど、本格的なRPG要素を追加します。
 
-| プラグイン | 役割 | 状態 |
-|---|---|---|
-| [orelia-core](core/index.md) | 戦闘・プレイヤー・ステータスの基盤（Item, Skill, Job, Status, Accessory, Monster, Boss, Effect, Economy, GUI, Database, API） | 実装済み |
-| [orelia-world](world/index.md) | コンテンツ層（Quest, NPC, Dialogue, Story, Dungeon, Region, CutScene, Event） | 実装済み |
-| [orelia-extra](extra/index.md) | 後発 MMORPG 機能（Party, Guild, Trade, Mail, Auction, Housing, Pet, Mount, Ranking, Achievement） | 実装済み |
+このサイトは大きく2つに分かれています。
 
-`orelia-world` / `orelia-extra` は `orelia-core` に依存し（`depend: [OreliaCore]`）、**`rpg.api` パッケージ経由でのみ** `orelia-core` と通信します。内部モジュールクラスへ直接アクセスすることはありません。`orelia-extra` は `orelia-world` にもソフト依存し（`AchievementModule` の `COMPLETE_QUEST` 条件のみ）、通信は `rpg.world.api.QuestApi` 経由です。
+- **[遊び方](play/index.md)** — サーバーに参加してから、レベル上げ・クエスト・ダンジョン・パーティー・ギルド・トレードなど、プレイヤーとして触れる機能の説明です。まずはこちらから読んでください。
+- **[管理者ガイド](admin/index.md)** — サーバー運営者向けに、管理者コマンド(`/oladmin` ほか)の使い方を1コマンドずつ詳しく説明します。
 
-```mermaid
-graph LR
-  world[orelia-world] -->|rpg.api.*| core[orelia-core]
-  extra[orelia-extra] -->|rpg.api.*| core
-  extra -.->|rpg.world.api.QuestApi（ソフト依存）| world
-```
+## Oreliaでできること(概要)
 
-## このドキュメントの構成
+- キャラクターレベル・ステータス(HP/SP/攻撃力/防御力/会心/属性ダメージ)を育てる
+- 職業を選び、専用武器・スキルを使いこなす
+- クエストを受注してNPCに報告し、経験値・お金・アイテム・称号を得る
+- ダンジョンに挑戦し、難易度を選んでボスを倒す
+- パーティー・ギルド・フレンドを組んで一緒に遊ぶ
+- ショップ・トレード・オークション・メールでアイテムやお金をやり取りする
+- 実績を解除し、ランキングで他プレイヤーと競う
+- 住居・ペット・乗り物を持つ
+- 釣り・木こり・採掘・農業で素材を集める
 
-- **[アーキテクチャ](architecture/overview.md)** — 3プラグイン共通のモジュールシステム、Config、データベース、プレイヤーデータ、コマンド体系
-- **[orelia-core](core/index.md)** — 各ゲームプレイモジュールの仕様と `rpg.api` 公開APIリファレンス
-- **[orelia-world](world/index.md)** — Quest / NPC / Dialogue / Story / Dungeon / Region / CutScene / Event の仕様
-- **[orelia-extra](extra/index.md)** — Party / Guild / Trade / Mail / Auction / Housing / Pet / Mount / Ranking / Achievement の仕様
-
-## ビルド
-
-```bash
-./gradlew build
-```
-
-いずれのプラグインも `repo.papermc.io`（Paper API）と `jitpack.io`（Vault API、および orelia-world・orelia-extra は orelia-core も jitpack 経由で解決）へのネットワークアクセスが必要です。
-
-## リロード
-
-- `orelia-core`: `/oladmin reload`
-- `orelia-world`: `/rpgworldadmin reload`
-- `orelia-extra`: `/oladmin extrareload`
-
-いずれもサーバー再起動なしに全モジュールの設定ファイルを再読込します。
+詳しくは [遊び方](play/index.md) の各ページを参照してください。
