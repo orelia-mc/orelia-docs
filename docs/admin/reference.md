@@ -9,8 +9,10 @@
 | `spawnboss <id>` | ボスを湧かせる |
 | `spawnpoint add\|remove\|list` | 自動湧きポイント管理 |
 | `dungeonblock set\|remove\|list` | ダンジョン開放ブロック管理 |
+| `dungeonarena add\|set\|remove\|list` | ダンジョン入場地点の登録・移動・削除 |
 | `npc create\|move\|remove\|list\|spawnall` | NPC管理 |
 | `spawnnpc <id>` | 職業指南役NPCなどを個別設置 |
+| `houseplot register\|move\|remove\|list` | 住居プロットの登録・移動・削除 |
 | `item give\|levelup` | 武器配布・武器レベル操作 |
 | `gathering resetregen confirm` | 採取再生成タスクの一括取消 |
 | `chat <message>` | 管理者チャット送信 |
@@ -25,7 +27,7 @@
 | `money give\|set\|take` | 所持金操作 |
 | `config <core\|world\|extra> list\|view\|get\|set\|save` | 設定ファイルの確認・編集 |
 | `confighelp <core\|world\|extra> <file>` | 設定ファイルの全キー一覧 |
-| `quest complete\|start\|resetcooldown\|list\|ids` | クエスト操作 |
+| `quest complete\|start\|resetcooldown\|list\|ids\|defs\|info` | クエスト操作・定義確認 |
 | `title list\|grant\|equip\|unequip` | 称号操作 |
 | `dungeon unlock\|forcestart\|forceend\|status\|ids` | ダンジョン操作 |
 | `debugmode on\|off\|toggle` | デバッグモード切り替え |
